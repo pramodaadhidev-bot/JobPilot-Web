@@ -1,0 +1,556 @@
+/* =========================================================
+   JOBPILOT REFERENCE VISUAL STYLE
+   VISUAL ONLY — no functionality or IDs changed
+   ========================================================= */
+
+/* ---------- DASHBOARD ---------- */
+
+@media (min-width: 901px) {
+
+    body {
+        background:
+            radial-gradient(circle at 88% 8%, rgba(246,205,91,.16), transparent 24%),
+            radial-gradient(circle at 8% 90%, rgba(124,77,255,.10), transparent 28%),
+            #f3eee6 !important;
+    }
+
+    .dashboard {
+        min-height: calc(100vh - 32px) !important;
+        margin: 16px !important;
+        display: grid !important;
+        grid-template-columns: 225px minmax(0, 1fr) 325px !important;
+        overflow: hidden !important;
+        border-radius: 30px !important;
+        background: #fff !important;
+        box-shadow:
+            0 24px 70px rgba(61,48,72,.13),
+            0 3px 12px rgba(61,48,72,.06) !important;
+    }
+
+    /* Plum navigation panel */
+    .sidebar {
+        width: auto !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: calc(100vh - 32px) !important;
+        position: relative !important;
+        padding: 28px 15px 20px !important;
+        background:
+            radial-gradient(circle at 50% 18%, rgba(255,255,255,.07), transparent 24%),
+            linear-gradient(180deg, #51475c 0%, #453b4d 100%) !important;
+        border: 0 !important;
+    }
+
+    .sidebar-brand {
+        padding: 0 12px 30px !important;
+    }
+
+    .brand-icon {
+        width: 42px !important;
+        height: 42px !important;
+        border-radius: 14px !important;
+        background: #f3c84b !important;
+        color: #40364a !important;
+        box-shadow: 0 10px 22px rgba(0,0,0,.12) !important;
+    }
+
+    .sidebar-profile {
+        margin: 0 5px 28px !important;
+        padding: 12px !important;
+        border: 0 !important;
+        border-radius: 18px !important;
+        background: rgba(255,255,255,.08) !important;
+    }
+
+    .profile-avatar {
+        background: #f4c94f !important;
+        color: #44394c !important;
+    }
+
+    .nav-item {
+        min-height: 47px !important;
+        border-radius: 14px !important;
+        color: rgba(255,255,255,.74) !important;
+        margin: 3px 0 !important;
+    }
+
+    .nav-item:hover {
+        background: rgba(255,255,255,.08) !important;
+        color: #fff !important;
+    }
+
+    .nav-item.active {
+        background: #f4c94f !important;
+        color: #44394c !important;
+        box-shadow: 0 10px 24px rgba(0,0,0,.13) !important;
+    }
+
+    .nav-item.active span:first-child {
+        color: #44394c !important;
+    }
+
+    .sidebar-bottom {
+        margin-top: auto !important;
+    }
+
+    /* White central workspace */
+    .dashboard-main {
+        min-width: 0 !important;
+        padding: 38px 34px 48px !important;
+        background: #fff !important;
+    }
+
+    .dashboard-header {
+        margin-bottom: 26px !important;
+    }
+
+    .welcome-label,
+    .section-eyebrow {
+        color: #776d79 !important;
+        letter-spacing: 1.5px !important;
+        font-size: 10px !important;
+    }
+
+    .dashboard-header h1 {
+        color: #27232b !important;
+        font-size: clamp(30px, 3vw, 42px) !important;
+        font-weight: 850 !important;
+        letter-spacing: -1.4px !important;
+    }
+
+    .header-subtitle {
+        color: #817a84 !important;
+    }
+
+    .header-search {
+        border: 1px solid #ece7ec !important;
+        border-radius: 18px !important;
+        box-shadow: 0 8px 24px rgba(67,55,72,.06) !important;
+    }
+
+    /* Profile completion becomes a soft editorial banner */
+    .completion-card {
+        border: 0 !important;
+        border-radius: 24px !important;
+        background:
+            radial-gradient(circle at 90% 15%, rgba(244,201,79,.22), transparent 26%),
+            linear-gradient(135deg, #fffaf0, #f8f4ff) !important;
+        box-shadow: 0 12px 32px rgba(67,55,72,.07) !important;
+    }
+
+    .completion-icon {
+        background: #f4c94f !important;
+        color: #46394d !important;
+        box-shadow: none !important;
+    }
+
+    .complete-btn {
+        background: #51465b !important;
+        box-shadow: 0 9px 20px rgba(65,55,73,.18) !important;
+    }
+
+    /* Pinterest-like stat cards */
+    .stats-grid {
+        gap: 14px !important;
+    }
+
+    .stat-card {
+        border: 1px solid #eee9ed !important;
+        border-radius: 21px !important;
+        box-shadow: 0 9px 25px rgba(67,55,72,.045) !important;
+    }
+
+    .stat-card:nth-child(1) .stat-icon {
+        background: #eee7f7 !important;
+        color: #604f75 !important;
+    }
+
+    .stat-card:nth-child(2) .stat-icon {
+        background: #fff1bf !important;
+        color: #8b6b10 !important;
+    }
+
+    .stat-card:nth-child(3) .stat-icon {
+        background: #f9e5ed !important;
+        color: #8b5269 !important;
+    }
+
+    .stat-card:nth-child(4) .stat-icon {
+        background: #e5f2ec !important;
+        color: #39755c !important;
+    }
+
+    .stat-card h2 {
+        color: #2d2831 !important;
+    }
+
+    /* Recommended jobs area */
+    .content-section {
+        margin-bottom: 28px !important;
+    }
+
+    .section-heading h2 {
+        color: #2b2730 !important;
+        font-size: 23px !important;
+    }
+
+    .activity-card {
+        border: 1px solid #eee9ed !important;
+        border-radius: 22px !important;
+        box-shadow: 0 8px 25px rgba(67,55,72,.045) !important;
+    }
+
+    /* Golden profile panel */
+    .dashboard-right {
+        min-width: 0 !important;
+        padding: 34px 24px 34px 0 !important;
+        background: #f4c94f !important;
+    }
+
+    .dashboard-right::before {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .right-panel-header {
+        padding-left: 22px !important;
+    }
+
+    .right-panel-header .section-eyebrow {
+        color: rgba(63,51,67,.62) !important;
+    }
+
+    .right-panel-header h2 {
+        color: #3e3442 !important;
+    }
+
+    .right-panel-header a {
+        color: #4a3c4e !important;
+    }
+
+    .profile-summary-card {
+        margin-left: 22px !important;
+        border: 0 !important;
+        border-radius: 25px !important;
+        background: rgba(255,255,255,.96) !important;
+        box-shadow: 0 12px 30px rgba(94,73,25,.13) !important;
+    }
+
+    .large-avatar {
+        background: #51465b !important;
+        box-shadow: none !important;
+    }
+
+    .profile-summary-card h2 {
+        color: #2e2931 !important;
+    }
+
+    .profile-details {
+        border-color: #eee8e4 !important;
+    }
+
+    .right-section {
+        margin-left: 22px !important;
+        border: 0 !important;
+        border-radius: 21px !important;
+        background: rgba(255,255,255,.94) !important;
+        box-shadow: 0 9px 24px rgba(94,73,25,.10) !important;
+    }
+
+    .right-section-title h3 {
+        color: #39313c !important;
+    }
+
+    .quick-action-card {
+        margin-left: 22px !important;
+        background: #51465b !important;
+        box-shadow: 0 12px 28px rgba(70,54,79,.17) !important;
+    }
+}
+
+
+/* ---------- REGISTRATION ---------- */
+
+body.register-page {
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 22px !important;
+    box-sizing: border-box !important;
+    background:
+        radial-gradient(circle at 8% 20%, rgba(115,78,151,.12), transparent 26%),
+        radial-gradient(circle at 92% 85%, rgba(245,201,79,.12), transparent 25%),
+        #f1ece7 !important;
+}
+
+.register-container {
+    min-height: calc(100vh - 44px) !important;
+    max-width: 1450px !important;
+    margin: 0 auto !important;
+    overflow: hidden !important;
+    border-radius: 30px !important;
+    background: #f4ddec !important;
+    box-shadow:
+        0 25px 70px rgba(63,48,73,.14),
+        0 3px 12px rgba(63,48,73,.06) !important;
+}
+
+/* Deep purple visual side */
+.register-visual {
+    position: relative !important;
+    overflow: hidden !important;
+    background:
+        radial-gradient(circle at 25% 25%, rgba(162,112,190,.34), transparent 22%),
+        radial-gradient(circle at 75% 72%, rgba(112,89,176,.28), transparent 30%),
+        linear-gradient(145deg, #35265d 0%, #4b3475 50%, #354c7f 100%) !important;
+}
+
+/* Abstract floral/petal artwork — no reference image data copied */
+.register-visual::before,
+.register-visual::after {
+    content: "" !important;
+    position: absolute !important;
+    border-radius: 50% 45% 55% 42% !important;
+    pointer-events: none !important;
+    filter: blur(.2px) !important;
+}
+
+.register-visual::before {
+    width: 310px !important;
+    height: 540px !important;
+    left: 12% !important;
+    bottom: -95px !important;
+    transform: rotate(-25deg) !important;
+    background:
+        radial-gradient(ellipse at 45% 20%, rgba(255,255,255,.42) 0 8%, transparent 9%),
+        radial-gradient(ellipse at 35% 38%, rgba(196,175,241,.48) 0 9%, transparent 10%),
+        radial-gradient(ellipse at 62% 52%, rgba(220,192,245,.34) 0 10%, transparent 11%),
+        radial-gradient(ellipse at 42% 70%, rgba(171,146,222,.38) 0 9%, transparent 10%);
+    opacity: .85 !important;
+}
+
+.register-visual::after {
+    width: 190px !important;
+    height: 420px !important;
+    right: 4% !important;
+    bottom: -120px !important;
+    transform: rotate(28deg) !important;
+    background:
+        radial-gradient(ellipse at 50% 25%, rgba(255,255,255,.28) 0 10%, transparent 11%),
+        radial-gradient(ellipse at 35% 55%, rgba(210,190,245,.32) 0 12%, transparent 13%),
+        radial-gradient(ellipse at 65% 76%, rgba(173,151,222,.28) 0 10%, transparent 11%);
+}
+
+.register-visual-content {
+    position: relative !important;
+    z-index: 2 !important;
+    padding: 42px !important;
+}
+
+.auth-brand {
+    color: #fff !important;
+}
+
+.auth-brand-icon {
+    background: #f4c94f !important;
+    color: #44384c !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,.14) !important;
+}
+
+.register-illustration {
+    height: 390px !important;
+    margin: 20px 0 0 !important;
+    position: relative !important;
+}
+
+.illustration-card,
+.illustration-circle {
+    display: none !important;
+}
+
+.register-visual-text {
+    position: relative !important;
+    z-index: 4 !important;
+    max-width: 560px !important;
+}
+
+.register-visual-text h1 {
+    color: #fff !important;
+    font-size: clamp(38px, 4vw, 62px) !important;
+    line-height: 1.02 !important;
+    letter-spacing: -2.5px !important;
+}
+
+.register-visual-text h1 span {
+    color: #f4c94f !important;
+}
+
+.register-visual-text p {
+    max-width: 510px !important;
+    color: rgba(255,255,255,.72) !important;
+    line-height: 1.7 !important;
+}
+
+/* Pink/lavender form side */
+.register-form-section {
+    background:
+        radial-gradient(circle at 90% 10%, rgba(255,255,255,.55), transparent 25%),
+        #f4ddec !important;
+}
+
+.register-form-wrapper {
+    max-width: 760px !important;
+    padding: 58px 72px !important;
+}
+
+.register-heading {
+    margin-bottom: 32px !important;
+}
+
+.auth-eyebrow {
+    color: #6c4d88 !important;
+    letter-spacing: 2px !important;
+    font-weight: 800 !important;
+}
+
+.register-heading h2 {
+    color: #29205a !important;
+    font-size: clamp(32px, 3vw, 48px) !important;
+    letter-spacing: -1.5px !important;
+}
+
+.register-heading p {
+    color: #786d7c !important;
+}
+
+/* Clean large input fields */
+.register-page .auth-field label {
+    color: #5e5263 !important;
+    font-weight: 700 !important;
+}
+
+.register-page .auth-field input,
+.register-page .password-input {
+    border-color: #c9b4c9 !important;
+    background: rgba(255,255,255,.48) !important;
+    border-radius: 14px !important;
+}
+
+.register-page .auth-field input {
+    min-height: 54px !important;
+    box-sizing: border-box !important;
+}
+
+.register-page .auth-field input:focus {
+    border-color: #5b49a5 !important;
+    box-shadow: 0 0 0 4px rgba(91,73,165,.10) !important;
+    background: #fff !important;
+}
+
+.register-page .password-toggle {
+    color: #5b49a5 !important;
+}
+
+/* Main purple action */
+.register-page .auth-submit {
+    min-height: 56px !important;
+    border-radius: 14px !important;
+    background: #5140a0 !important;
+    box-shadow: 0 12px 25px rgba(81,64,160,.22) !important;
+    font-weight: 850 !important;
+    letter-spacing: .4px !important;
+}
+
+.register-page .auth-submit:hover {
+    background: #45358c !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Google button */
+.register-page .google-btn {
+    min-height: 54px !important;
+    border-radius: 14px !important;
+    border-color: #cbb8ca !important;
+    background: rgba(255,255,255,.55) !important;
+}
+
+.register-page .auth-divider {
+    color: #877887 !important;
+}
+
+.register-page .auth-switch {
+    color: #766b79 !important;
+}
+
+.register-page .auth-switch a {
+    color: #5140a0 !important;
+    font-weight: 800 !important;
+}
+
+
+/* ---------- RESPONSIVE ---------- */
+
+@media (max-width: 1000px) and (min-width: 801px) {
+    .dashboard {
+        grid-template-columns: 205px minmax(0,1fr) 280px !important;
+    }
+
+    .dashboard-main {
+        padding: 30px 22px 40px !important;
+    }
+
+    .dashboard-right {
+        padding-right: 15px !important;
+    }
+
+    .register-form-wrapper {
+        padding: 45px 42px !important;
+    }
+
+    .register-visual-content {
+        padding: 32px !important;
+    }
+}
+
+@media (max-width: 800px) {
+
+    body.register-page {
+        padding: 0 !important;
+    }
+
+    .register-container {
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+    }
+
+    .register-visual {
+        min-height: 360px !important;
+    }
+
+    .register-visual-content {
+        padding: 28px 24px !important;
+    }
+
+    .register-illustration {
+        height: 120px !important;
+    }
+
+    .register-visual-text h1 {
+        font-size: 36px !important;
+    }
+
+    .register-form-wrapper {
+        padding: 38px 24px !important;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .register-name-row {
+        grid-template-columns: 1fr !important;
+    }
+
+    .register-form-wrapper {
+        padding: 32px 20px !important;
+    }
+}
