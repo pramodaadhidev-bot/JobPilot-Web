@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Jobs - JobPilot</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="jobs-page">
+
+    <!-- SIDEBAR -->
+    <aside class="jobs-sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-mark">J</div>
+            <span>JobPilot</span>
+        </div>
+
+        <div class="jobs-nav-label">WORKSPACE</div>
+
+        <nav class="jobs-nav">
+            <a href="dashboard.html">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="jobs.html" class="active">
+                <span class="nav-icon">⌕</span>
+                <span>Find Jobs</span>
+            </a>
+
+            <a href="recommendations.html">
+                <span class="nav-icon">✦</span>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="saved.html">
+                <span class="nav-icon">♡</span>
+                <span>Saved Jobs</span>
+            </a>
+
+            <div class="jobs-nav-label jobs-nav-label-space">TOOLS</div>
+
+            <a href="resume.html">
+                <span class="nav-icon">▤</span>
+                <span>Resume Analysis</span>
+            </a>
+
+            <a href="profile.html">
+                <span class="nav-icon">◎</span>
+                <span>Profile</span>
+            </a>
+
+            <a href="settings.html">
+                <span class="nav-icon">⚙</span>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="sidebar-user">
+                <div class="sidebar-avatar" id="jobsSidebarAvatar">U</div>
+
+                <div class="sidebar-user-info">
+                    <strong id="jobsSidebarUserName">User</strong>
+                    <small id="jobsSidebarUserEmail">Signed in</small>
+                </div>
+            </div>
+
+            <button id="jobsLogoutBtn" class="sidebar-logout">
+                <span>↪</span>
+                Logout
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="jobs-main">
+
+        <!-- TOP HEADER -->
+        <header class="jobs-header">
+
+            <div class="jobs-heading">
+
+                <div class="jobs-heading-badge">
+                    <span>✦</span>
+                    SMART JOB SEARCH
+                </div>
+
+                <h1>Find your next opportunity</h1>
+
+                <p>
+                    Discover jobs matched to your skills, qualification,
+                    experience and preferences.
+                </p>
+
+            </div>
+
+            <div class="jobs-header-right">
+
+                <div class="jobs-live-status">
+                    <span class="live-dot"></span>
+                    Live job search
+                </div>
+
+                <div class="jobs-header-avatar" id="jobsHeaderAvatar">
+                    U
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- SEARCH CARD -->
+        <section class="job-search-panel">
+
+            <div class="search-panel-top">
+
+                <div class="search-panel-icon">
+                    ⌕
+                </div>
+
+                <div>
+                    <h2>What are you looking for?</h2>
+                    <p>
+                        Enter your preferences and JobPilot will find
+                        relevant opportunities.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form id="jobSearchForm">
+
+                <div class="job-search-grid">
+
+                    <!-- SKILLS -->
+                    <div class="job-field job-field-large">
+                        <label for="jobSkills">
+                            <span class="field-icon">✦</span>
+                            Skills
+                        </label>
+
+                        <input
+                            type="text"
+                            id="jobSkills"
+                            placeholder="Java, Python, SQL, Angular..."
+                            autocomplete="off"
+                        >
+
+                        <small>Separate multiple skills with commas</small>
+                    </div>
+
+
+                    <!-- QUALIFICATION -->
+                    <div class="job-field">
+                        <label for="jobQualification">
+                            <span class="field-icon">▤</span>
+                            Qualification
+                        </label>
+
+                        <input
+                            type="text"
+                            id="jobQualification"
+                            placeholder="B.Tech Computer Science"
+                            autocomplete="off"
+                        >
+                    </div>
+
+
+                    <!-- LOCATION -->
+                    <div class="job-field">
+                        <label for="jobLocation">
+                            <span class="field-icon">⌖</span>
+                            Preferred Location
+                        </label>
+
+                        <input
+                            type="text"
+                            id="jobLocation"
+                            placeholder="Kochi, Kerala"
+                            autocomplete="off"
+                        >
+                    </div>
+
+
+                    <!-- EXPERIENCE -->
+                    <div class="job-field">
+                        <label for="jobExperience">
+                            <span class="field-icon">◷</span>
+                            Experience
+                        </label>
+
+                        <div class="input-with-suffix">
+                            <input
+                                type="number"
+                                id="jobExperience"
+                                min="0"
+                                step="0.5"
+                                placeholder="0"
+                            >
+                            <span>years</span>
+                        </div>
+                    </div>
+
+
+                    <!-- SALARY -->
+                    <div class="job-field">
+                        <label for="jobSalary">
+                            <span class="field-icon">₹</span>
+                            Expected Salary
+                        </label>
+
+                        <div class="input-with-prefix">
+                            <span>₹</span>
+                            <input
+                                type="number"
+                                id="jobSalary"
+                                min="0"
+                                placeholder="Expected salary"
+                            >
+                        </div>
+                    </div>
+
+
+                    <!-- JOB TYPE -->
+                    <div class="job-field">
+                        <label for="jobType">
+                            <span class="field-icon">◈</span>
+                            Job Type
+                        </label>
+
+                        <select id="jobType">
+                            <option value="all">All Job Types</option>
+                            <option value="full-time">Full Time</option>
+                            <option value="part-time">Part Time</option>
+                            <option value="contract">Contract</option>
+                            <option value="temporary">Temporary</option>
+                            <option value="permanent">Permanent</option>
+                        </select>
+                    </div>
+
+                </div>
+
+
+                <!-- SEARCH FOOTER -->
+                <div class="search-actions">
+
+                    <div class="search-hint">
+                        <span>✦</span>
+                        Jobs are ranked by your profile match
+                    </div>
+
+                    <button
+                        type="button"
+                        id="findJobsBtn"
+                        class="find-jobs-btn"
+                    >
+                        <span class="find-jobs-btn-icon">⌕</span>
+                        <span id="findJobsBtnText">Find Matching Jobs</span>
+                        <span
+                            id="findJobsSpinner"
+                            class="jobs-spinner hidden"
+                        ></span>
+                    </button>
+
+                </div>
+
+                <div id="jobSearchMessage" class="job-search-message"></div>
+
+            </form>
+
+        </section>
+
+
+        <!-- RESULTS -->
+        <section class="jobs-results-section">
+
+            <div class="results-heading">
+
+                <div>
+                    <div class="results-eyebrow">
+                        <span></span>
+                        OPPORTUNITIES
+                    </div>
+
+                    <h2 id="jobsResultsTitle">
+                        Recommended Jobs
+                    </h2>
+
+                    <p id="jobsResultsSubtitle">
+                        Based on your search preferences
+                    </p>
+                </div>
+
+                <div class="results-heading-right">
+                    <div
+                        id="jobsResultCount"
+                        class="jobs-result-count"
+                    >
+                        0 jobs
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- JOB RESULTS CONTAINER -->
+            <div id="jobsResults" class="jobs-results">
+
+                <div class="jobs-empty-state">
+
+                    <div class="empty-state-visual">
+
+                        <div class="empty-orbit orbit-one"></div>
+                        <div class="empty-orbit orbit-two"></div>
+
+                        <div class="empty-state-icon">
+                            ✦
+                        </div>
+
+                    </div>
+
+                    <h3>Ready to find your next opportunity?</h3>
+
+                    <p>
+                        Tell us what you're looking for above and
+                        JobPilot will search for opportunities that
+                        fit your profile.
+                    </p>
+
+                    <div class="empty-state-features">
+                        <span>✓ Skill matching</span>
+                        <span>✓ Location matching</span>
+                        <span>✓ Smart ranking</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/jobs.js?v=3"></script>
+
+</body>
+</html>

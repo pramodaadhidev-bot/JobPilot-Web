@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPilot - Recommendations</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .recommendations-main {
+            min-width: 0;
+            padding: 30px 32px 40px;
+            background:
+                radial-gradient(circle at 85% 5%, rgba(124,77,255,.12), transparent 28%),
+                radial-gradient(circle at 10% 30%, rgba(91,92,226,.08), transparent 25%),
+                #f7f7ff;
+            min-height: 100vh;
+        }
+
+        .recommendation-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .recommendation-eyebrow {
+            margin: 0 0 7px;
+            color: #6b6b83;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .09em;
+        }
+
+        .recommendation-header h1 {
+            margin: 0;
+            color: #17172b;
+            font-size: clamp(25px, 3vw, 34px);
+            line-height: 1.15;
+        }
+
+        .recommendation-header p {
+            margin: 9px 0 0;
+            color: #6b6b83;
+            font-size: 14px;
+        }
+
+        .refresh-recommendations {
+            border: 0;
+            border-radius: 13px;
+            padding: 12px 17px;
+            background: linear-gradient(135deg, #5b5ce2, #7c4dff);
+            color: #fff;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 9px 22px rgba(91,92,226,.22);
+        }
+
+        .refresh-recommendations:hover {
+            transform: translateY(-1px);
+        }
+
+        .profile-match-panel {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 26px;
+            padding: 22px 24px;
+            border: 1px solid #e9e9f2;
+            border-radius: 20px;
+            background: rgba(255,255,255,.9);
+            box-shadow: 0 12px 30px rgba(42,42,88,.07);
+        }
+
+        .profile-match-panel h2 {
+            margin: 0 0 7px;
+            font-size: 17px;
+            color: #17172b;
+        }
+
+        .profile-match-panel p {
+            margin: 0;
+            color: #77778e;
+            font-size: 13px;
+            line-height: 1.55;
+        }
+
+        .profile-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 13px;
+        }
+
+        .profile-tag {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f0efff;
+            color: #5556c9;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .recommendation-count-box {
+            min-width: 105px;
+            text-align: center;
+            padding: 14px 18px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #f0efff, #f7f2ff);
+        }
+
+        .recommendation-count-box strong {
+            display: block;
+            color: #5556d6;
+            font-size: 28px;
+            line-height: 1;
+        }
+
+        .recommendation-count-box span {
+            display: block;
+            margin-top: 6px;
+            color: #77778e;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .recommendation-status {
+            display: none;
+            margin-bottom: 18px;
+            padding: 13px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .recommendation-status.show {
+            display: block;
+        }
+
+        .recommendation-status.loading {
+            background: #f0efff;
+            color: #5556c9;
+        }
+
+        .recommendation-status.error {
+            background: #fff0f0;
+            color: #c34a4a;
+        }
+
+        .recommendation-status.info {
+            background: #fff9e8;
+            color: #946f00;
+        }
+
+        .recommendations-section {
+            min-width: 0;
+        }
+
+        .recommendations-section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .recommendations-section-head h2 {
+            margin: 0;
+            color: #17172b;
+            font-size: 19px;
+        }
+
+        .recommendations-section-head span {
+            color: #77778e;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        #jobsResults {
+            min-width: 0;
+        }
+
+        .recommendation-empty {
+            padding: 55px 25px;
+            border: 1px dashed #d9d8eb;
+            border-radius: 20px;
+            background: rgba(255,255,255,.75);
+            text-align: center;
+        }
+
+        .recommendation-empty .empty-icon {
+            width: 58px;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            border-radius: 17px;
+            background: #f0efff;
+            font-size: 26px;
+        }
+
+        .recommendation-empty h3 {
+            margin: 0 0 7px;
+            color: #24243b;
+            font-size: 17px;
+        }
+
+        .recommendation-empty p {
+            max-width: 500px;
+            margin: 0 auto;
+            color: #77778e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .recommendation-empty a {
+            display: inline-block;
+            margin-top: 17px;
+            padding: 10px 15px;
+            border-radius: 11px;
+            background: #5b5ce2;
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        @media (max-width: 900px) {
+            .recommendations-main {
+                padding: 22px 20px 35px;
+            }
+
+            .profile-match-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .recommendation-count-box {
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .dashboard {
+                display: grid !important;
+                grid-template-columns: 82px minmax(0, 1fr) !important;
+                min-height: 100vh;
+                width: 100%;
+            }
+
+            .sidebar {
+                position: sticky !important;
+                top: 0 !important;
+                width: 82px !important;
+                height: 100vh !important;
+                min-height: 100vh !important;
+                padding: 18px 8px !important;
+                box-sizing: border-box;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            .sidebar-brand {
+                justify-content: center !important;
+                padding-bottom: 18px !important;
+            }
+
+            .brand-text {
+                display: none !important;
+            }
+
+            .sidebar-profile {
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                padding: 10px 0 18px !important;
+            }
+
+            .profile-avatar {
+                margin: 0 auto 7px !important;
+            }
+
+            .profile-name,
+            .profile-email {
+                display: none !important;
+            }
+
+            .sidebar-nav {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 7px !important;
+                overflow: visible !important;
+            }
+
+            .nav-item {
+                width: 100% !important;
+                min-height: 46px !important;
+                padding: 10px 5px !important;
+                justify-content: center !important;
+                flex: none !important;
+            }
+
+            .nav-item span:last-child {
+                display: none !important;
+            }
+
+            .nav-item span:first-child {
+                margin: 0 !important;
+            }
+
+            .sidebar-bottom {
+                display: block !important;
+                margin-top: auto !important;
+                padding-top: 12px !important;
+            }
+
+            .logout-btn {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+
+            .recommendations-main {
+                min-width: 0 !important;
+                padding: 20px 14px 35px !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard {
+                grid-template-columns: 72px minmax(0, 1fr) !important;
+            }
+
+            .sidebar {
+                width: 72px !important;
+                padding-left: 6px !important;
+                padding-right: 6px !important;
+            }
+
+            .recommendations-main {
+                padding-left: 11px !important;
+                padding-right: 11px !important;
+            }
+
+            .recommendation-header {
+                display: block;
+            }
+
+            .refresh-recommendations {
+                margin-top: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dashboard">
+
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">✦</div>
+            <div class="brand-text">
+                <div class="brand-name">JobPilot</div>
+                <div class="brand-tagline">Career, simplified.</div>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="recommendationSidebarAvatar">U</div>
+            <div class="profile-name" id="recommendationSidebarUserName">Loading...</div>
+            <div class="profile-email" id="recommendationSidebarUserEmail">Loading...</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span>⌂</span><span>Dashboard</span>
+            </a>
+            <a href="jobs.html" class="nav-item">
+                <span>⌕</span><span>Find Jobs</span>
+            </a>
+            <a href="recommendations.html" class="nav-item active">
+                <span>✦</span><span>Recommendations</span>
+            </a>
+            <a href="saved.html" class="nav-item">
+                <span>♡</span><span>Saved Jobs</span>
+            </a>
+            <a href="resume.html" class="nav-item">
+                <span>▣</span><span>Resume Analysis</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <span>◎</span><span>My Profile</span>
+            </a>
+            <a href="settings.html" class="nav-item">
+                <span>⚙</span><span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-btn" id="recommendationLogoutBtn">
+                <span>↪</span><span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="recommendations-main">
+
+        <header class="recommendation-header">
+            <div>
+                <p class="recommendation-eyebrow">AI-powered job matching</p>
+                <h1>Recommended for you</h1>
+                <p>Discover opportunities matched to your skills, qualification, experience and preferences.</p>
+            </div>
+
+            <button type="button" class="refresh-recommendations" id="refreshRecommendations">
+                ↻ Refresh
+            </button>
+        </header>
+
+        <section class="profile-match-panel">
+            <div>
+                <h2>Your recommendation profile</h2>
+                <p id="recommendationProfileText">
+                    Loading your profile preferences...
+                </p>
+                <div class="profile-tags" id="recommendationProfileTags"></div>
+            </div>
+
+            <div class="recommendation-count-box">
+                <strong id="recommendationCount">0</strong>
+                <span>matches found</span>
+            </div>
+        </section>
+
+        <div class="recommendation-status" id="recommendationStatus"></div>
+
+        <section class="recommendations-section">
+            <div class="recommendations-section-head">
+                <h2>Top job matches</h2>
+                <span id="recommendationSubtitle">Based on your profile</span>
+            </div>
+
+            <div id="jobsResults">
+                <div class="recommendation-empty">
+                    <div class="empty-icon">✦</div>
+                    <h3>Finding your best matches...</h3>
+                    <p>We're checking current job opportunities against your profile.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+
+<script src="js/jobs.js"></script>
+<script type="module">
+import { getAuth, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const auth = getAuth();
+
+const sidebarAvatar = document.getElementById("recommendationSidebarAvatar");
+const sidebarName = document.getElementById("recommendationSidebarUserName");
+const sidebarEmail = document.getElementById("recommendationSidebarUserEmail");
+const logoutButton = document.getElementById("recommendationLogoutBtn");
+
+const jobsResults = document.getElementById("jobsResults");
+const recommendationCount = document.getElementById("recommendationCount");
+const recommendationStatus = document.getElementById("recommendationStatus");
+const recommendationProfileText = document.getElementById("recommendationProfileText");
+const recommendationProfileTags = document.getElementById("recommendationProfileTags");
+const refreshButton = document.getElementById("refreshRecommendations");
+
+let currentUser = null;
+
+function profileKey(uid) {
+    return "jobpilot_profile_" + uid;
+}
+
+function getProfile(user) {
+    const saved = localStorage.getItem(profileKey(user.uid));
+
+    if (!saved) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(saved);
+    } catch (error) {
+        return null;
+    }
+}
+
+function showStatus(message, type) {
+    recommendationStatus.textContent = message;
+    recommendationStatus.className =
+        "recommendation-status show " + type;
+}
+
+function hideStatus() {
+    recommendationStatus.className = "recommendation-status";
+}
+
+function showProfile(profile) {
+    recommendationProfileTags.innerHTML = "";
+
+    if (!profile) {
+        recommendationProfileText.textContent =
+            "Complete your profile to get recommendations tailored to your career preferences.";
+
+        return;
+    }
+
+    const parts = [];
+
+    if (profile.qualification) {
+        parts.push(profile.qualification);
+    }
+
+    if (profile.experience) {
+        parts.push(profile.experience + " experience");
+    }
+
+    if (profile.preferredLocation) {
+        parts.push(profile.preferredLocation);
+    }
+
+    if (profile.jobType) {
+        parts.push(profile.jobType);
+    }
+
+    recommendationProfileText.textContent =
+        parts.length
+            ? "Recommendations are being matched using your saved profile preferences."
+            : "Add more profile information to improve your recommendations.";
+
+    const skills = (profile.skills || "")
+        .split(",")
+        .map(function(skill) {
+            return skill.trim();
+        })
+        .filter(Boolean);
+
+    skills.slice(0, 6).forEach(function(skill) {
+        const tag = document.createElement("span");
+        tag.className = "profile-tag";
+        tag.textContent = skill;
+        recommendationProfileTags.appendChild(tag);
+    });
+}
+
+function showEmpty(message, buttonText) {
+    jobsResults.innerHTML =
+        '<div class="recommendation-empty">' +
+            '<div class="empty-icon">✦</div>' +
+            '<h3>No recommendations yet</h3>' +
+            '<p>' + message + '</p>' +
+            (buttonText
+                ? '<a href="profile.html">Complete My Profile</a>'
+                : '') +
+        '</div>';
+}
+
+async function loadRecommendations() {
+    if (!currentUser) {
+        return;
+    }
+
+    const profile = getProfile(currentUser);
+    showProfile(profile);
+
+    if (!profile) {
+        recommendationCount.textContent = "0";
+        showEmpty(
+            "Tell JobPilot about your skills, qualification, experience and preferred location so we can find better matches.",
+            true
+        );
+        return;
+    }
+
+    const skills = profile.skills || "";
+    const qualification = profile.qualification || "";
+    const experience = profile.experience || "";
+    const location = profile.preferredLocation || "";
+    const salary = profile.expectedSalary || "";
+    const jobType = profile.jobType || "";
+
+    if (
+        !skills &&
+        !qualification &&
+        !experience &&
+        !location &&
+        !salary &&
+        !jobType
+    ) {
+        recommendationCount.textContent = "0";
+        showEmpty(
+            "Your profile is still empty. Add your preferences first, then come back for personalized recommendations.",
+            true
+        );
+        return;
+    }
+
+    if (!window.JobPilotJobs ||
+        typeof window.JobPilotJobs.searchJobs !== "function" ||
+        typeof window.JobPilotJobs.renderJobs !== "function") {
+
+        showStatus(
+            "The job recommendation engine is not ready. Please refresh the page.",
+            "error"
+        );
+        return;
+    }
+
+    showStatus("Finding jobs that match your profile...", "loading");
+
+    jobsResults.innerHTML =
+        '<div class="recommendation-empty">' +
+            '<div class="empty-icon">⏳</div>' +
+            '<h3>Finding your best matches...</h3>' +
+            '<p>Searching current job listings and calculating your match scores.</p>' +
+        '</div>';
+
+    try {
+        const jobs = await window.JobPilotJobs.searchJobs(
+            skills,
+            qualification,
+            location,
+            experience,
+            salary,
+            jobType
+        );
+
+        hideStatus();
+
+        const results = Array.isArray(jobs) ? jobs : [];
+
+        recommendationCount.textContent = String(results.length);
+
+        if (!results.length) {
+            showEmpty(
+                "We couldn't find matching jobs right now. Try updating your profile or checking Find Jobs with broader preferences.",
+                false
+            );
+            return;
+        }
+        window.JobPilotJobs.renderJobs(results);
+
+
+
+    } catch (error) {
+        console.error("Recommendation error:", error);
+        showStatus(
+            "Unable to load recommendations right now. Please try again.",
+            "error"
+        );
+    }
+}
+
+onAuthStateChanged(auth, function(user) {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    currentUser = user;
+
+    const displayName = user.displayName || "User";
+    const email = user.email || "";
+
+    const initials = displayName
+        .split(" ")
+        .filter(Boolean)
+        .map(function(part) {
+            return part.charAt(0);
+        })
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+
+    if (sidebarName) {
+        sidebarName.textContent = displayName;
+    }
+
+    if (sidebarEmail) {
+        sidebarEmail.textContent = email;
+    }
+
+    if (sidebarAvatar) {
+        sidebarAvatar.textContent = initials || "U";
+    }
+
+    loadRecommendations();
+});
+
+if (refreshButton) {
+    refreshButton.addEventListener("click", function() {
+        loadRecommendations();
+    });
+}
+
+if (logoutButton) {
+    logoutButton.addEventListener("click", async function() {
+        try {
+            await auth.signOut();
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    });
+}
+</script>
+
+
+</body>
+</html>

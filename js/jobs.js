@@ -1,0 +1,1277 @@
+(function () {
+    "use strict";
+
+    const form = document.getElementById("jobSearchForm");
+    const resultsContainer = document.getElementById("jobsResults");
+    const resultsTitle = document.getElementById("jobsResultsTitle");
+    const resultsSubtitle = document.getElementById("jobsResultsSubtitle");
+    const resultCount = document.getElementById("jobsResultCount");
+    const searchMessage = document.getElementById("jobSearchMessage");
+    const findButton = document.getElementById("findJobsBtn");
+    const buttonText = document.getElementById("findJobsBtnText");
+    const spinner = document.getElementById("findJobsSpinner");
+
+    if (!form) {
+        window.JobPilotJobs = { searchJobs: searchJobs, renderJobs: renderJobs };
+        return;
+    }
+
+    function setLoading(loading) {
+        if (findButton) {
+            findButton.disabled = loading;
+        }
+
+        if (buttonText) {
+            buttonText.textContent = loading
+                ? "Finding matching jobs..."
+                : "Find Matching Jobs";
+        }
+
+        if (spinner) {
+            spinner.style.display = loading ? "inline-block" : "none";
+        }
+    }
+
+    function showMessage(message, type) {
+        if (!searchMessage) {
+            return;
+        }
+
+        searchMessage.textContent = message;
+        searchMessage.className = "job-search-message";
+
+        if (type) {
+            searchMessage.classList.add(type);
+        }
+    }
+
+    function clean(value) {
+        return String(value || "").trim();
+    }
+
+    function splitSkills(value) {
+        return clean(value)
+            .split(",")
+            .map(function (item) {
+                return item.trim().toLowerCase();
+            })
+            .filter(Boolean);
+    }
+
+    function normalizeText(value) {
+        return clean(value).toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function getJobLocation(job) {
+        if (
+            job &&
+            job.location &&
+            typeof job.location === "object" &&
+            job.location.display_name
+        ) {
+            return normalizeText(job.location.display_name);
+        }
+
+        if (
+            job &&
+            job.location &&
+            typeof job.location === "object" &&
+            Array.isArray(job.location.area)
+        ) {
+            return normalizeText(job.location.area.join(", "));
+        }
+
+        if (job && job.candidate_required_location) {
+            return normalizeText(job.candidate_required_location);
+        }
+
+        if (job && job.where) {
+            return normalizeText(job.where);
+        }
+
+        const text = normalizeText(
+            (job && job.title ? job.title : "") +
+            " " +
+            (job && job.description ? job.description : "")
+        );
+
+        if (
+            text.includes("remote") ||
+            text.includes("work from home") ||
+            text.includes("work-from-home") ||
+            text.includes("wfh")
+        ) {
+            return "remote";
+        }
+
+        return "location not specified";
+    }
+
+    function isKeralaLocation(value) {
+        const text = normalizeText(value);
+
+        const keralaCities = [
+            "kochi",
+            "ernakulam",
+            "thiruvananthapuram",
+            "trivandrum",
+            "calicut",
+            "kozhikode",
+            "kannur",
+            "thalassery",
+            "thrissur",
+            "palakkad",
+            "kottayam",
+            "alappuzha",
+            "alleppey",
+            "kollam",
+            "kasaragod",
+            "malappuram",
+            "pathanamthitta",
+            "idukki",
+            "wayanad"
+        ];
+
+        if (text.includes("kerala")) {
+            return true;
+        }
+
+        return keralaCities.some(function (city) {
+            return text.includes(city);
+        });
+    }
+
+    function isLocationMatch(job, preferredLocation) {
+        const preferred = normalizeText(preferredLocation);
+
+        if (!preferred) {
+            return true;
+        }
+
+        const jobLocation = getJobLocation(job);
+
+        if (jobLocation.includes(preferred)) {
+            return true;
+        }
+
+        const preferredWords = preferred
+            .split(/[\s,]+/)
+            .filter(function (word) {
+                return word.length >= 3;
+            });
+
+        for (let i = 0; i < preferredWords.length; i++) {
+            if (jobLocation.includes(preferredWords[i])) {
+                return true;
+            }
+        }
+
+        if (isKeralaLocation(preferred) && jobLocation.includes("kerala")) {
+            return true;
+        }
+
+        if (
+            jobLocation.includes("remote") &&
+            preferred.length > 0
+        ) {
+            return false;
+        }
+
+        return false;
+    }
+
+    function getJobText(job) {
+        return normalizeText(
+            (job && job.title ? job.title : "") +
+            " " +
+            (job && job.description ? job.description : "") +
+            " " +
+            (
+                job &&
+                job.category &&
+                typeof job.category === "object" &&
+                job.category.label
+                    ? job.category.label
+                    : ""
+            )
+        );
+    }
+
+    function extractExperienceRange(description) {
+        const text = clean(description);
+
+        const match = text.match(
+            /(\d+)\s*(?:-|to)\s*(\d+)\s*years?/i
+        );
+
+        if (!match) {
+            return null;
+        }
+
+        return {
+            min: Number(match[1]),
+            max: Number(match[2])
+        };
+    }
+
+    function calculateMatchScore(
+        job,
+        userSkills,
+        qualification,
+        preferredLocation,
+        experience,
+        jobType
+    ) {
+        let score = 0;
+
+        const title = normalizeText(job.title || "");
+        const jobText = getJobText(job);
+
+        // Skills = 50 points
+        if (userSkills.length > 0) {
+            let matchedSkills = 0;
+
+            userSkills.forEach(function (skill) {
+                if (
+                    title.includes(skill) ||
+                    jobText.includes(skill)
+                ) {
+                    matchedSkills++;
+                }
+            });
+
+            score +=
+                (matchedSkills / userSkills.length) * 50;
+        }
+
+        // Qualification = 25 points
+        const qualificationText = normalizeText(qualification);
+
+        if (qualificationText) {
+            if (jobText.includes(qualificationText)) {
+                score += 25;
+            } else {
+                const qualificationWords =
+                    qualificationText
+                        .split(/\s+/)
+                        .filter(function (word) {
+                            return word.length >= 3;
+                        });
+
+                if (qualificationWords.length > 0) {
+                    let matchedWords = 0;
+
+                    qualificationWords.forEach(function (word) {
+                        if (jobText.includes(word)) {
+                            matchedWords++;
+                        }
+                    });
+
+                    score +=
+                        (matchedWords / qualificationWords.length) * 25;
+                }
+            }
+        }
+
+        // Location = 20 points
+        const preferred = normalizeText(preferredLocation);
+
+        if (preferred) {
+            const jobLocation = getJobLocation(job);
+
+            if (jobLocation.includes(preferred)) {
+                score += 20;
+            } else {
+                const preferredWords = preferred
+                    .split(/[\s,]+/)
+                    .filter(function (word) {
+                        return word.length >= 3;
+                    });
+
+                if (preferredWords.length > 0) {
+                    let matchedLocationWords = 0;
+
+                    preferredWords.forEach(function (word) {
+                        if (jobLocation.includes(word)) {
+                            matchedLocationWords++;
+                        }
+                    });
+
+                    score +=
+                        (matchedLocationWords /
+                            preferredWords.length) * 20;
+                }
+            }
+        }
+
+        // Job Type = 5 points
+        const preferredJobType = normalizeText(jobType);
+
+        if (
+            preferredJobType &&
+            preferredJobType !== "all" &&
+            preferredJobType !== "any"
+        ) {
+            const contractType =
+                normalizeText(job.contract_type || "");
+
+            const actualJobType =
+                normalizeText(job.job_type || "");
+
+            const combinedType =
+                contractType + " " + actualJobType;
+
+            if (combinedType.includes(preferredJobType)) {
+                score += 5;
+            }
+        }
+
+        // Experience bonus = +3 points
+        const userExperience = Number(experience);
+
+        if (userExperience > 0) {
+            const range = extractExperienceRange(
+                job.description || ""
+            );
+
+            if (
+                range &&
+                userExperience >= range.min &&
+                userExperience <= range.max
+            ) {
+                score += 3;
+            }
+        }
+
+        return Math.max(
+            0,
+            Math.min(100, Math.round(score))
+        );
+    }
+
+    function getSearchTerms(skills, qualification) {
+        const terms = [];
+
+        splitSkills(skills).forEach(function (skill) {
+            terms.push(skill);
+        });
+
+        if (clean(qualification)) {
+            terms.push(clean(qualification));
+        }
+
+        if (terms.length === 0) {
+            terms.push("jobs");
+        }
+
+        return terms;
+    }
+
+    function getLocationTerms(location) {
+        const value = clean(location);
+
+        if (!value) {
+            return [""];
+        }
+
+        return [value];
+    }
+
+    async function fetchAdzuna(what, where, page) {
+        const url =
+            "/api/adzuna?what=" +
+            encodeURIComponent(what) +
+            "&where=" +
+            encodeURIComponent(where) +
+            "&page=" +
+            encodeURIComponent(page);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(
+                "Adzuna request failed (" +
+                response.status +
+                ")"
+            );
+        }
+
+        return await response.json();
+    }
+
+    function getUniqueJobId(job) {
+        if (job && job.id !== undefined && job.id !== null) {
+            return String(job.id);
+        }
+
+        if (job && job.redirect_url) {
+            return job.redirect_url;
+        }
+
+        return (
+            String(job && job.title ? job.title : "") +
+            "|" +
+            getJobLocation(job)
+        );
+    }
+
+    async function searchJobs(
+        skills,
+        qualification,
+        preferredLocation,
+        experience,
+        salary,
+        jobType
+    ) {
+        const uniqueJobs = new Map();
+
+        const searchTerms = getSearchTerms(
+            skills,
+            qualification
+        );
+
+        const locationTerms = getLocationTerms(
+            preferredLocation
+        );
+
+        for (let i = 0; i < searchTerms.length; i++) {
+
+            for (let j = 0; j < locationTerms.length; j++) {
+
+                for (let page = 1; page <= 3; page++) {
+
+                    const data = await fetchAdzuna(
+                        searchTerms[i],
+                        locationTerms[j],
+                        page
+                    );
+
+                    const jobs = Array.isArray(data.results)
+                        ? data.results
+                        : [];
+
+                    if (jobs.length === 0) {
+                        break;
+                    }
+
+                    jobs.forEach(function (job) {
+
+                        if (
+                            !isLocationMatch(
+                                job,
+                                preferredLocation
+                            )
+                        ) {
+                            return;
+                        }
+
+                        const id = getUniqueJobId(job);
+
+                        if (!uniqueJobs.has(id)) {
+
+                            const matchScore =
+                                calculateMatchScore(
+                                    job,
+                                    splitSkills(skills),
+                                    qualification,
+                                    preferredLocation,
+                                    experience,
+                                    jobType
+                                );
+
+                            job._match_score = matchScore;
+
+                            uniqueJobs.set(id, job);
+                        }
+                    });
+                }
+            }
+        }
+
+        const result = Array.from(uniqueJobs.values());
+
+        result.sort(function (a, b) {
+            return (
+                Number(b._match_score || 0) -
+                Number(a._match_score || 0)
+            );
+        });
+
+        return result.slice(0, 50);
+    }
+
+
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function stripHtml(value) {
+        const div = document.createElement("div");
+        div.innerHTML = String(value || "");
+        return div.textContent || div.innerText || "";
+    }
+
+    function getCompanyName(job) {
+        return (
+            job.company_name ||
+            (job.company && job.company.display_name) ||
+            "Company"
+        );
+    }
+
+    function getJobSkills(job) {
+        const text = (
+            (job.title || "") + " " +
+            (job.category || "") + " " +
+            (job.description || "")
+        ).toLowerCase();
+
+        const skillLibrary = [
+            "Java",
+            "Python",
+            "JavaScript",
+            "TypeScript",
+            "C",
+            "C++",
+            "C#",
+            "SQL",
+            "HTML",
+            "CSS",
+            "React",
+            "Angular",
+            "Vue",
+            "Node.js",
+            "Spring Boot",
+            "Django",
+            "Flask",
+            "PHP",
+            "Laravel",
+            "Android",
+            "Flutter",
+            "React Native",
+            "AWS",
+            "Azure",
+            "Google Cloud",
+            "Docker",
+            "Kubernetes",
+            "DevOps",
+            "Git",
+            "GitHub",
+            "Linux",
+            "Machine Learning",
+            "Artificial Intelligence",
+            "Deep Learning",
+            "Data Science",
+            "Data Analysis",
+            "Power BI",
+            "Tableau",
+            "Excel",
+            "Cybersecurity",
+            "Figma",
+            "UI/UX",
+            "Communication",
+            "Project Management",
+            "Sales",
+            "Marketing",
+            "Accounting",
+            "Recruitment"
+        ];
+
+        const detected = [];
+
+        skillLibrary.forEach(function (skill) {
+            const skillText = skill.toLowerCase();
+
+            if (text.includes(skillText)) {
+                detected.push(skill);
+            }
+        });
+
+        return detected.slice(0, 6);
+    }
+    function getCompanyLogo(job) {
+        const possibleUrls = [
+            job.company_logo,
+            job.logo,
+            job.company && job.company.logo,
+            job.company && job.company.logo_url,
+            job.company && job.company.image
+        ];
+
+        for (let i = 0; i < possibleUrls.length; i++) {
+            const url = possibleUrls[i];
+
+            if (
+                typeof url === "string" &&
+                /^https?:\/\//i.test(url)
+            ) {
+                return url;
+            }
+        }
+
+        return "";
+    }
+    function getJobEmoji(job) {
+        const text = (
+            (job.title || "") + " " +
+            (job.category || "") + " " +
+            (job.description || "")
+        ).toLowerCase();
+
+        if (
+            text.includes("artificial intelligence") ||
+            text.includes("machine learning") ||
+            text.includes("ai engineer") ||
+            text.includes("ml engineer")
+        ) {
+            return "🤖";
+        }
+
+        if (
+            text.includes("cyber") ||
+            text.includes("security") ||
+            text.includes("information security")
+        ) {
+            return "🔐";
+        }
+
+        if (
+            text.includes("cloud") ||
+            text.includes("devops") ||
+            text.includes("aws") ||
+            text.includes("azure") ||
+            text.includes("kubernetes")
+        ) {
+            return "☁️";
+        }
+
+        if (
+            text.includes("data scientist") ||
+            text.includes("data analyst") ||
+            text.includes("data engineer") ||
+            text.includes("analytics")
+        ) {
+            return "📊";
+        }
+
+        if (
+            text.includes("android") ||
+            text.includes("ios") ||
+            text.includes("mobile developer") ||
+            text.includes("flutter") ||
+            text.includes("react native")
+        ) {
+            return "📱";
+        }
+
+        if (
+            text.includes("frontend") ||
+            text.includes("front-end") ||
+            text.includes("backend") ||
+            text.includes("back-end") ||
+            text.includes("full stack") ||
+            text.includes("full-stack") ||
+            text.includes("web developer")
+        ) {
+            return "🌐";
+        }
+
+        if (
+            text.includes("software engineer") ||
+            text.includes("software developer") ||
+            text.includes("developer") ||
+            text.includes("programmer") ||
+            text.includes("java") ||
+            text.includes("python") ||
+            text.includes("javascript")
+        ) {
+            return "💻";
+        }
+
+        if (
+            text.includes("ui/ux") ||
+            text.includes("ux designer") ||
+            text.includes("ui designer") ||
+            text.includes("graphic designer") ||
+            text.includes("designer")
+        ) {
+            return "🎨";
+        }
+
+        if (
+            text.includes("marketing") ||
+            text.includes("digital marketing") ||
+            text.includes("social media")
+        ) {
+            return "📣";
+        }
+
+        if (
+            text.includes("sales") ||
+            text.includes("business development")
+        ) {
+            return "📈";
+        }
+
+        if (
+            text.includes("finance") ||
+            text.includes("accountant") ||
+            text.includes("accounting") ||
+            text.includes("banking")
+        ) {
+            return "💰";
+        }
+
+        if (
+            text.includes("human resources") ||
+            text.includes("hr ") ||
+            text.includes("recruiter") ||
+            text.includes("recruitment")
+        ) {
+            return "👥";
+        }
+
+        if (
+            text.includes("teacher") ||
+            text.includes("teaching") ||
+            text.includes("education") ||
+            text.includes("lecturer")
+        ) {
+            return "🎓";
+        }
+
+        if (
+            text.includes("doctor") ||
+            text.includes("nurse") ||
+            text.includes("medical") ||
+            text.includes("healthcare")
+        ) {
+            return "🩺";
+        }
+
+        if (
+            text.includes("engineer") ||
+            text.includes("engineering")
+        ) {
+            return "⚙️";
+        }
+
+        return "💼";
+    }
+    function getCompanyInitial(job) {
+        const name = getCompanyName(job).trim();
+        return name ? name.charAt(0).toUpperCase() : "J";
+    }
+
+    function formatSalary(job) {
+        const min = Number(job.salary_min);
+        const max = Number(job.salary_max);
+        const currency = String(job.salary_currency || "INR").toUpperCase();
+
+        if (!Number.isFinite(min) && !Number.isFinite(max)) {
+            return "Salary not disclosed";
+        }
+
+        function formatAmount(value) {
+            if (currency === "INR") {
+                if (value >= 100000) {
+                    return "₹" + (value / 100000).toFixed(1) + "L";
+                }
+
+                if (value >= 1000) {
+                    return "₹" + Math.round(value / 1000) + "K";
+                }
+
+                return "₹" + Math.round(value);
+            }
+
+            if (currency === "USD") {
+                if (value >= 1000) {
+                    return "$" + Math.round(value / 1000) + "K";
+                }
+
+                return "$" + Math.round(value);
+            }
+
+            return currency + " " + Math.round(value);
+        }
+
+        if (Number.isFinite(min) && Number.isFinite(max)) {
+            return formatAmount(min) + " – " + formatAmount(max) + " / year";
+        }
+
+        if (Number.isFinite(min)) {
+            return "From " + formatAmount(min) + " / year";
+        }
+
+        return "Up to " + formatAmount(max) + " / year";
+    }
+
+    function formatPostedDate(value) {
+        if (!value) {
+            return "Recently listed";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "Recently listed";
+        }
+
+        const days = Math.floor(
+            (Date.now() - date.getTime()) / 86400000
+        );
+
+        if (days <= 0) {
+            return "Today";
+        }
+
+        if (days === 1) {
+            return "1 day ago";
+        }
+
+        if (days < 30) {
+            return days + " days ago";
+        }
+
+        return "Recently listed";
+    }
+
+    function getSavedJobs() {
+        try {
+            return JSON.parse(
+                localStorage.getItem("jobpilot_saved_jobs") || "[]"
+            );
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function saveJobs(jobs) {
+        try {
+            localStorage.setItem(
+                "jobpilot_saved_jobs",
+                JSON.stringify(jobs)
+            );
+        } catch (error) {
+            console.error("Unable to save jobs:", error);
+        }
+    }
+
+    function getJobSaveId(job) {
+        return String(
+            job.id ||
+            job.redirect_url ||
+            job.title ||
+            Math.random()
+        );
+    }
+
+    function isJobSaved(job) {
+        const id = getJobSaveId(job);
+
+        return getSavedJobs().some(function (savedJob) {
+            return String(savedJob._save_id) === id;
+        });
+    }
+
+    function toggleSaveJob(job, button) {
+        const id = getJobSaveId(job);
+        const savedJobs = getSavedJobs();
+
+        const index = savedJobs.findIndex(function (savedJob) {
+            return String(savedJob._save_id) === id;
+        });
+
+        if (index >= 0) {
+            savedJobs.splice(index, 1);
+
+            button.classList.remove("saved");
+            button.innerHTML =
+                '<span class="save-icon">♡</span><span>Save</span>';
+            button.setAttribute("aria-label", "Save job");
+        } else {
+            const savedJob = Object.assign({}, job, {
+                _save_id: id,
+                _saved_at: new Date().toISOString()
+            });
+
+            savedJobs.push(savedJob);
+
+            button.classList.add("saved");
+            button.innerHTML =
+                '<span class="save-icon">♥</span><span>Saved</span>';
+            button.setAttribute("aria-label", "Remove saved job");
+        }
+
+        saveJobs(savedJobs);
+    }
+
+    function renderJobs(jobs) {
+        const resultsContainer =
+            document.getElementById("jobsResults");
+
+        const resultsTitle =
+            document.getElementById("jobsResultsTitle");
+
+        const resultsSubtitle =
+            document.getElementById("jobsResultsSubtitle");
+
+        const resultCount =
+            document.getElementById("jobsResultCount");
+
+        if (!resultsContainer) {
+            return;
+        }
+
+        if (!jobs || !jobs.length) {
+
+            resultsContainer.innerHTML = `
+                <div class="jobs-empty-state">
+                    <div class="jobs-empty-icon">⌕</div>
+                    <h3>No matching jobs found</h3>
+                    <p>
+                        Try changing your skills, qualification or preferred
+                        location to discover more opportunities.
+                    </p>
+                </div>
+            `;
+
+            if (resultsTitle) {
+                resultsTitle.textContent = "Recommended jobs";
+            }
+
+            if (resultsSubtitle) {
+                resultsSubtitle.textContent =
+                    "No matching opportunities were found.";
+            }
+
+            if (resultCount) {
+                resultCount.textContent = "0";
+            }
+
+            return;
+        }
+
+        if (resultsTitle) {
+            resultsTitle.textContent = "Recommended jobs";
+        }
+
+        if (resultsSubtitle) {
+            resultsSubtitle.textContent =
+                "Jobs ranked by how well they match your profile.";
+        }
+
+        if (resultCount) {
+            resultCount.textContent = String(jobs.length);
+        }
+
+        const cards = jobs.map(function (job) {
+
+            const score = Math.max(
+                0,
+                Math.min(
+                    100,
+                    Math.round(Number(job._match_score || 0))
+                )
+            );
+
+            const title =
+                job.title ||
+                "Untitled position";
+
+            const company = getCompanyName(job);
+            const companyLogo = getCompanyLogo(job);
+            const jobSkills = getJobSkills(job);
+            const jobEmoji = getJobEmoji(job);
+
+            const location =
+                getJobLocation(job) ||
+                "Location not specified";
+
+            const jobType =
+                job.job_type ||
+                job.contract_type ||
+                "Job";
+
+            const contract =
+                job.contract_type ||
+                "";
+
+            const salary =
+                formatSalary(job);
+
+            const posted =
+                formatPostedDate(job.created);
+
+            const description =
+                stripHtml(
+                    job.description ||
+                    job.redirect_url ||
+                    ""
+                )
+                .replace(/\s+/g, " ")
+                .trim();
+
+            const shortDescription =
+                description.length > 145
+                    ? description.substring(0, 145) + "..."
+                    : description;
+
+            const saved =
+                isJobSaved(job);
+
+            const saveId =
+                escapeHtml(getJobSaveId(job));
+
+            const redirectUrl =
+                escapeHtml(
+                    job.redirect_url ||
+                    "#"
+                );
+
+            return `
+                <article class="jobs-pinterest-card">
+
+                    <div class="job-card-top">
+
+                        <div class="company-tile">
+                            ${companyLogo ? `<img src="${escapeHtml(companyLogo)}" alt="${escapeHtml(company)} logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ""}
+                            <span class="company-emoji" style="${companyLogo ? "display:none" : "display:flex"}">${escapeHtml(jobEmoji)}</span>
+                        </div>
+
+                        <div class="job-card-top-info">
+                            <span class="job-card-source">
+                                ADZUNA LISTING
+                            </span>
+
+                            <span class="job-card-posted">
+                                ${escapeHtml(posted)}
+                            </span>
+                        </div>
+
+                        <div
+                            class="job-match-ring"
+                            style="--score:${score}%"
+                            title="${score}% match"
+                        >
+                            <span>${score}%</span>
+                        </div>
+
+                    </div>
+
+                    <div class="job-card-content">
+
+                        <h3 class="job-card-title">
+                            ${escapeHtml(title)}
+                        </h3>
+
+                        <div class="job-card-company">
+                            ${escapeHtml(company)}
+                        </div>
+
+                        <div class="job-card-meta">
+
+                            <span>
+                                <span class="meta-icon">📍</span>
+                                ${escapeHtml(location)}
+                            </span>
+
+                            <span>
+                                <span class="meta-icon">◷</span>
+                                ${escapeHtml(jobType)}
+                            </span>
+
+                            ${
+                                contract
+                                    ? `
+                                    <span>
+                                        <span class="meta-icon">◈</span>
+                                        ${escapeHtml(contract)}
+                                    </span>
+                                    `
+                                    : ""
+                            }
+
+                        </div>
+
+                        ${jobSkills.length ? `
+                            <div class="job-card-skills">
+                                <span class="skills-label">🛠️ Skills</span>
+                                <div class="skill-chips">
+                                    ${jobSkills.map(function(skill) {
+                                        return `<span class="skill-chip">${escapeHtml(skill)}</span>`;
+                                    }).join("")}
+                                </div>
+                            </div>
+                        ` : ""}
+                        <div class="job-card-salary">
+                            <span class="salary-icon">₹</span>
+                            <span>${escapeHtml(salary)}</span>
+                        </div>
+
+                        ${
+                            shortDescription
+                                ? `
+                                <p class="job-card-description">
+                                    ${escapeHtml(shortDescription)}
+                                </p>
+                                `
+                                : ""
+                        }
+
+                    </div>
+
+                    <div class="job-card-bottom">
+
+                        <a
+                            class="job-view-button"
+                            href="${redirectUrl}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            View Job
+                            <span>↗</span>
+                        </a>
+
+                        <button
+                            type="button"
+                            class="job-save-button ${saved ? "saved" : ""}"
+                            data-save-id="${saveId}"
+                            aria-label="${saved ? "Remove saved job" : "Save job"}"
+                        >
+                            <span class="save-icon">
+                                ${saved ? "♥" : "♡"}
+                            </span>
+                            <span>
+                                ${saved ? "Saved" : "Save"}
+                            </span>
+                        </button>
+
+                    </div>
+
+                </article>
+            `;
+        }).join("");
+
+        resultsContainer.innerHTML = `
+            <div class="jobs-pinterest-grid">
+                ${cards}
+            </div>
+        `;
+
+        const saveButtons =
+            resultsContainer.querySelectorAll(
+                ".job-save-button"
+            );
+
+        saveButtons.forEach(function (button, index) {
+
+            button.addEventListener("click", function () {
+                toggleSaveJob(
+                    jobs[index],
+                    button
+                );
+            });
+
+        });
+    }
+    if (findButton) {
+        findButton.addEventListener("click", function () {
+            form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+        });
+    }
+
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+        console.log("JOB SEARCH SUBMIT HANDLER FIRED");
+
+        const skills =
+            clean(
+                (document.getElementById("jobSkills") ? document.getElementById("jobSkills").value : "")
+            );
+
+        const qualification =
+            clean(
+                (document.getElementById("jobQualification") ? document.getElementById("jobQualification").value : "")
+            );
+
+        const location =
+            clean(
+                (document.getElementById("jobLocation") ? document.getElementById("jobLocation").value : "")
+            );
+
+        const experience =
+            clean(
+                (document.getElementById("jobExperience") ? document.getElementById("jobExperience").value : "")
+            );
+
+        const salary =
+            clean(
+                (document.getElementById("jobSalary") ? document.getElementById("jobSalary").value : "")
+            );
+
+        const jobType =
+            clean(
+                (document.getElementById("jobType") ? document.getElementById("jobType").value : "")
+            );
+
+        if (
+            !skills &&
+            !qualification &&
+            !location
+        ) {
+            showMessage(
+                "Enter at least a skill, qualification or preferred location.",
+                "error"
+            );
+            return;
+        }
+
+        setLoading(true);
+        showMessage(
+            "Searching real Adzuna jobs and calculating your match scores...",
+            "loading"
+        );
+
+        try {
+
+            const jobs = await searchJobs(
+                skills,
+                qualification,
+                location,
+                experience,
+                salary,
+                jobType
+            );
+
+            renderJobs(jobs);
+
+            showMessage(
+                jobs.length +
+                " matching jobs found.",
+                "success"
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Unable to fetch jobs right now. Please check the server and try again.",
+                "error"
+            );
+
+        } finally {
+            setLoading(false);
+        }
+    });
+
+})();

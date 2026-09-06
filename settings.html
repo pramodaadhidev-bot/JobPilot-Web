@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - JobPilot</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .settings-main {
+            min-width: 0;
+            min-height: 100vh;
+            padding: 34px;
+            background:
+                radial-gradient(circle at 85% 8%, rgba(124,77,255,.10), transparent 28%),
+                radial-gradient(circle at 15% 90%, rgba(91,92,226,.08), transparent 30%),
+                #f7f7ff;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+
+        .settings-header h1 {
+            margin: 0;
+            color: #17172b;
+            font-size: 30px;
+            line-height: 1.15;
+        }
+
+        .settings-header p {
+            margin: 8px 0 0;
+            color: #6b6b83;
+            font-size: 14px;
+        }
+
+        .settings-back {
+            color: #5b5ce2;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .settings-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 310px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .settings-card {
+            background: #fff;
+            border: 1px solid #e9e9f2;
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: 0 14px 40px rgba(42,38,100,.07);
+            margin-bottom: 18px;
+        }
+
+        .settings-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-card h2 {
+            margin: 0;
+            color: #252542;
+            font-size: 18px;
+        }
+
+        .settings-card-description {
+            margin: 7px 0 20px;
+            color: #7b7b91;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .settings-account {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ededf4;
+            border-radius: 16px;
+            background: #fafaff;
+        }
+
+        .settings-avatar {
+            width: 52px;
+            height: 52px;
+            flex: 0 0 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,#5b5ce2,#7c4dff);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 900;
+            box-shadow: 0 8px 20px rgba(91,92,226,.20);
+        }
+
+        .settings-account-name {
+            color: #292947;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        .settings-account-email {
+            margin-top: 4px;
+            color: #77778e;
+            font-size: 12px;
+            word-break: break-word;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 15px 0;
+            border-bottom: 1px solid #eeeeF5;
+        }
+
+        .settings-row:first-of-type {
+            padding-top: 0;
+        }
+
+        .settings-row:last-of-type {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .settings-row-title {
+            color: #30304b;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .settings-row-description {
+            margin-top: 4px;
+            color: #85859a;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .settings-select {
+            min-width: 145px;
+            border: 1px solid #dedeea;
+            border-radius: 10px;
+            padding: 9px 11px;
+            background: #fff;
+            color: #30304b;
+            font-family: inherit;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .settings-toggle {
+            position: relative;
+            width: 46px;
+            height: 25px;
+            flex: 0 0 46px;
+        }
+
+        .settings-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .settings-toggle-slider {
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            background: #d8d8e5;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .settings-toggle-slider:before {
+            content: "";
+            position: absolute;
+            width: 19px;
+            height: 19px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,.15);
+            transition: .2s ease;
+        }
+
+        .settings-toggle input:checked + .settings-toggle-slider {
+            background: #5b5ce2;
+        }
+
+        .settings-toggle input:checked + .settings-toggle-slider:before {
+            transform: translateX(21px);
+        }
+
+        .settings-button {
+            border: 0;
+            border-radius: 11px;
+            padding: 11px 15px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .settings-button.primary {
+            color: #fff;
+            background: linear-gradient(135deg,#5b5ce2,#7c4dff);
+        }
+
+        .settings-button.danger {
+            color: #c43d50;
+            background: #fff0f2;
+        }
+
+        .settings-button.secondary {
+            color: #5b5ce2;
+            background: #eeedff;
+        }
+
+        .settings-message {
+            display: none;
+            margin-top: 14px;
+            padding: 11px 13px;
+            border-radius: 10px;
+            background: #effaf6;
+            color: #168362;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .settings-message.visible {
+            display: block;
+        }
+
+        .settings-side {
+            position: sticky;
+            top: 22px;
+        }
+
+        .settings-side-card {
+            padding: 23px;
+            border-radius: 22px;
+            color: #fff;
+            background: linear-gradient(150deg,#211b4b,#342b72);
+            box-shadow: 0 14px 35px rgba(35,29,78,.18);
+        }
+
+        .settings-side-card h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .settings-side-card p {
+            margin: 8px 0 20px;
+            color: rgba(255,255,255,.65);
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .settings-feature {
+            display: flex;
+            gap: 11px;
+            margin-top: 16px;
+        }
+
+        .settings-feature-icon {
+            width: 31px;
+            height: 31px;
+            flex: 0 0 31px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(255,255,255,.12);
+        }
+
+        .settings-feature strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .settings-feature span {
+            display: block;
+            margin-top: 3px;
+            color: rgba(255,255,255,.55);
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .settings-danger {
+            border-color: #f0dfe2;
+        }
+
+        .settings-danger h2 {
+            color: #b63749;
+        }
+
+        @media (max-width: 1050px) {
+            .settings-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-side {
+                position: static;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .settings-main {
+                padding: 20px 14px 35px;
+            }
+
+            .settings-header h1 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .settings-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .settings-row {
+                align-items: flex-start;
+            }
+
+            .settings-select {
+                min-width: 120px;
+            }
+
+            .settings-card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">✦</div>
+            <div>
+                <div class="brand-text">JobPilot</div>
+                <div class="brand-tagline">Career, simplified.</div>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="settingsSidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="settingsSidebarUserName">Loading...</div>
+                <div class="profile-email" id="settingsSidebarUserEmail">Loading...</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-item">
+                <span>⌂</span><span>Dashboard</span>
+            </a>
+
+            <a href="jobs.html" class="nav-item">
+                <span>⌕</span><span>Find Jobs</span>
+            </a>
+
+            <a href="recommendations.html" class="nav-item">
+                <span>✦</span><span>Recommendations</span>
+            </a>
+
+            <a href="saved.html" class="nav-item">
+                <span>♡</span><span>Saved Jobs</span>
+            </a>
+
+            <a href="resume.html" class="nav-item">
+                <span>▣</span><span>Resume Analysis</span>
+            </a>
+
+            <a href="profile.html" class="nav-item">
+                <span>◎</span><span>My Profile</span>
+            </a>
+
+            <a href="settings.html" class="nav-item active">
+                <span>⚙</span><span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-btn" id="settingsLogoutBtn">
+                <span>↪</span><span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+    <main class="settings-main">
+
+        <div class="settings-header">
+            <div>
+                <h1>Settings</h1>
+                <p>Manage your JobPilot account and preferences.</p>
+            </div>
+
+            <a href="dashboard.html" class="settings-back">← Dashboard</a>
+        </div>
+
+        <div class="settings-layout">
+
+            <section>
+
+                <div class="settings-card">
+
+                    <h2>Account</h2>
+
+                    <p class="settings-card-description">
+                        Your account information comes directly from your authenticated Firebase account.
+                    </p>
+
+                    <div class="settings-account">
+                        <div class="settings-avatar" id="settingsBigAvatar">U</div>
+
+                        <div>
+                            <div class="settings-account-name" id="settingsAccountName">
+                                Loading...
+                            </div>
+
+                            <div class="settings-account-email" id="settingsAccountEmail">
+                                Loading...
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="settings-card">
+
+                    <h2>Preferences</h2>
+
+                    <p class="settings-card-description">
+                        These preferences are saved on this device and do not change your Firebase account.
+                    </p>
+
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-row-title">Job alerts</div>
+                            <div class="settings-row-description">
+                                Enable local job-alert preference for this browser.
+                            </div>
+                        </div>
+
+                        <label class="settings-toggle">
+                            <input type="checkbox" id="settingsNotifications">
+                            <span class="settings-toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="settings-row">
+                        <div>
+                            <div class="settings-row-title">Appearance</div>
+                            <div class="settings-row-description">
+                                Choose the appearance preference for JobPilot.
+                            </div>
+                        </div>
+
+                        <select class="settings-select" id="settingsAppearance">
+                            <option value="light">Light</option>
+                            <option value="system">System</option>
+                        </select>
+                    </div>
+
+                    <div id="settingsPreferenceMessage" class="settings-message">
+                        Preferences saved.
+                    </div>
+
+                </div>
+
+                <div class="settings-card">
+
+                    <h2>Security</h2>
+
+                    <p class="settings-card-description">
+                        Keep your account secure with Firebase's password reset flow.
+                    </p>
+
+                    <div class="settings-row">
+
+                        <div>
+                            <div class="settings-row-title">Reset password</div>
+                            <div class="settings-row-description">
+                                A password-reset email will be sent to your registered email address.
+                            </div>
+                        </div>
+
+                        <button type="button" class="settings-button primary" id="settingsResetPassword">
+                            Reset Password
+                        </button>
+
+                    </div>
+
+                    <div id="settingsSecurityMessage" class="settings-message"></div>
+
+                </div>
+
+                <div class="settings-card settings-danger">
+
+                    <h2>Local data</h2>
+
+                    <p class="settings-card-description">
+                        Clear JobPilot data stored locally in this browser. This does not delete your Firebase account.
+                    </p>
+
+                    <div class="settings-row">
+
+                        <div>
+                            <div class="settings-row-title">Clear saved jobs and profile data</div>
+                            <div class="settings-row-description">
+                                This removes locally stored JobPilot profile and saved-job information.
+                            </div>
+                        </div>
+
+                        <button type="button" class="settings-button danger" id="settingsClearData">
+                            Clear Data
+                        </button>
+
+                    </div>
+
+                    <div id="settingsDataMessage" class="settings-message"></div>
+
+                </div>
+
+            </section>
+
+            <aside class="settings-side">
+
+                <div class="settings-side-card">
+
+                    <h3>JobPilot Settings</h3>
+
+                    <p>
+                        Keep your account preferences organized while your job profile remains connected to your recommendations.
+                    </p>
+
+                    <div class="settings-feature">
+                        <div class="settings-feature-icon">🔐</div>
+                        <div>
+                            <strong>Secure account</strong>
+                            <span>Authentication is handled through Firebase.</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-feature">
+                        <div class="settings-feature-icon">💼</div>
+                        <div>
+                            <strong>Job preferences</strong>
+                            <span>Your profile continues to power job matching.</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-feature">
+                        <div class="settings-feature-icon">💾</div>
+                        <div>
+                            <strong>Local preferences</strong>
+                            <span>Browser-only preferences stay on this device.</span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+
+<script type="module">
+import {
+    getAuth,
+    onAuthStateChanged,
+    sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const auth = getAuth();
+
+const sidebarAvatar =
+    document.getElementById("settingsSidebarAvatar");
+
+const sidebarName =
+    document.getElementById("settingsSidebarUserName");
+
+const sidebarEmail =
+    document.getElementById("settingsSidebarUserEmail");
+
+const bigAvatar =
+    document.getElementById("settingsBigAvatar");
+
+const accountName =
+    document.getElementById("settingsAccountName");
+
+const accountEmail =
+    document.getElementById("settingsAccountEmail");
+
+const notifications =
+    document.getElementById("settingsNotifications");
+
+const appearance =
+    document.getElementById("settingsAppearance");
+
+const preferenceMessage =
+    document.getElementById("settingsPreferenceMessage");
+
+const resetPasswordButton =
+    document.getElementById("settingsResetPassword");
+
+const securityMessage =
+    document.getElementById("settingsSecurityMessage");
+
+const clearDataButton =
+    document.getElementById("settingsClearData");
+
+const dataMessage =
+    document.getElementById("settingsDataMessage");
+
+const logoutButton =
+    document.getElementById("settingsLogoutBtn");
+
+let currentUser = null;
+
+function getInitials(name) {
+    const parts = String(name || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (!parts.length) {
+        return "U";
+    }
+
+    return parts
+        .map(function(part) {
+            return part.charAt(0);
+        })
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+}
+
+function showMessage(element, message) {
+    if (!element) {
+        return;
+    }
+
+    element.textContent = message;
+    element.classList.add("visible");
+}
+
+function loadPreferences() {
+    const savedNotifications =
+        localStorage.getItem("jobpilot_notifications");
+
+    const savedAppearance =
+        localStorage.getItem("jobpilot_appearance");
+
+    notifications.checked =
+        savedNotifications === "true";
+
+    appearance.value =
+        savedAppearance || "light";
+}
+
+function savePreferences() {
+    localStorage.setItem(
+        "jobpilot_notifications",
+        notifications.checked ? "true" : "false"
+    );
+
+    localStorage.setItem(
+        "jobpilot_appearance",
+        appearance.value
+    );
+
+    showMessage(
+        preferenceMessage,
+        "✓ Preferences saved on this device."
+    );
+}
+
+if (notifications) {
+    notifications.addEventListener(
+        "change",
+        savePreferences
+    );
+}
+
+if (appearance) {
+    appearance.addEventListener(
+        "change",
+        savePreferences
+    );
+}
+
+if (resetPasswordButton) {
+    resetPasswordButton.addEventListener(
+        "click",
+        async function() {
+
+            if (!currentUser || !currentUser.email) {
+                showMessage(
+                    securityMessage,
+                    "No authenticated email address is available."
+                );
+                return;
+            }
+
+            resetPasswordButton.disabled = true;
+            resetPasswordButton.textContent = "Sending...";
+
+            try {
+
+                await sendPasswordResetEmail(
+                    auth,
+                    currentUser.email
+                );
+
+                showMessage(
+                    securityMessage,
+                    "✓ Password reset email sent to your registered email address."
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Password reset error:",
+                    error
+                );
+
+                let message =
+                    "Unable to send the password reset email.";
+
+                if (
+                    error &&
+                    error.code ===
+                    "auth/too-many-requests"
+                ) {
+                    message =
+                        "Too many requests. Please try again later.";
+                }
+
+                showMessage(
+                    securityMessage,
+                    message
+                );
+
+            } finally {
+                resetPasswordButton.disabled = false;
+                resetPasswordButton.textContent =
+                    "Reset Password";
+            }
+        }
+    );
+}
+
+if (clearDataButton) {
+    clearDataButton.addEventListener(
+        "click",
+        function() {
+
+            const confirmed =
+                window.confirm(
+                    "Clear your locally stored JobPilot profile and saved jobs from this device?"
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            if (currentUser) {
+                localStorage.removeItem(
+                    "jobpilot_profile_" +
+                    currentUser.uid
+                );
+            }
+
+            localStorage.removeItem(
+                "jobpilot_saved_jobs"
+            );
+
+            showMessage(
+                dataMessage,
+                "✓ Local JobPilot profile and saved-job data have been cleared."
+            );
+        }
+    );
+}
+
+if (logoutButton) {
+    logoutButton.addEventListener(
+        "click",
+        async function() {
+
+            try {
+                await auth.signOut();
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error(
+                    "Logout error:",
+                    error
+                );
+            }
+        }
+    );
+}
+
+loadPreferences();
+
+onAuthStateChanged(
+    auth,
+    function(user) {
+
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        currentUser = user;
+
+        const name =
+            user.displayName || "User";
+
+        const email =
+            user.email || "";
+
+        const initials =
+            getInitials(name);
+
+        if (sidebarAvatar) {
+            sidebarAvatar.textContent =
+                initials;
+        }
+
+        if (sidebarName) {
+            sidebarName.textContent =
+                name;
+        }
+
+        if (sidebarEmail) {
+            sidebarEmail.textContent =
+                email;
+        }
+
+        if (bigAvatar) {
+            bigAvatar.textContent =
+                initials;
+        }
+
+        if (accountName) {
+            accountName.textContent =
+                name;
+        }
+
+        if (accountEmail) {
+            accountEmail.textContent =
+                email;
+        }
+    }
+);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPilot - Create Account</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="auth-page register-page">
+
+    <main class="register-container">
+
+        <section class="register-visual">
+            <div class="register-visual-content">
+
+                <a href="index.html" class="auth-brand">
+                    <span class="auth-brand-icon">J</span>
+                    <span>JobPilot</span>
+                </a>
+
+                <div class="register-illustration">
+                    <div class="illustration-circle circle-one"></div>
+                    <div class="illustration-circle circle-two"></div>
+
+                    <div class="illustration-card">
+                        <div class="illustration-card-top">
+                            <span class="illustration-avatar">J</span>
+                            <div>
+                                <strong>Career Profile</strong>
+                                <span>Build your future</span>
+                            </div>
+                        </div>
+
+                        <div class="illustration-progress">
+                            <span></span>
+                        </div>
+
+                        <div class="illustration-lines">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="register-visual-text">
+                    <h1>Find opportunities<br>that fit <span>you.</span></h1>
+                    <p>
+                        Create your JobPilot account and discover
+                        personalized job opportunities based on your
+                        skills, qualifications and career goals.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+
+        <section class="register-form-section">
+
+            <div class="register-form-wrapper">
+
+                <div class="register-mobile-brand">
+                    <a href="index.html" class="auth-brand">
+                        <span class="auth-brand-icon">J</span>
+                        <span>JobPilot</span>
+                    </a>
+                </div>
+
+                <div class="register-heading">
+                    <span class="auth-eyebrow">GET STARTED</span>
+                    <h2>Create your account</h2>
+                    <p>Start your personalized job search journey.</p>
+                </div>
+
+                <form id="registerForm">
+
+                    <div class="register-name-row">
+
+                        <div class="auth-field">
+                            <label for="registerFirstName">First Name</label>
+                            <input
+                                type="text"
+                                id="registerFirstName"
+                                placeholder="First name"
+                                autocomplete="given-name"
+                                required
+                            >
+                        </div>
+
+                        <div class="auth-field">
+                            <label for="registerLastName">Last Name</label>
+                            <input
+                                type="text"
+                                id="registerLastName"
+                                placeholder="Last name"
+                                autocomplete="family-name"
+                                required
+                            >
+                        </div>
+
+                    </div>
+
+
+                    <div class="auth-field">
+                        <label for="registerEmail">Email Address</label>
+                        <input
+                            type="email"
+                            id="registerEmail"
+                            placeholder="Enter your email"
+                            autocomplete="email"
+                            required
+                        >
+                    </div>
+
+
+                    <div class="auth-field">
+                        <label for="registerPassword">Password</label>
+
+                        <div class="password-input">
+                            <input
+                                type="password"
+                                id="registerPassword"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleRegisterPassword"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+                                SHOW
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="auth-field">
+                        <label for="registerConfirmPassword">
+                            Confirm Password
+                        </label>
+
+                        <div class="password-input">
+                            <input
+                                type="password"
+                                id="registerConfirmPassword"
+                                placeholder="Confirm your password"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleConfirmPassword"
+                                class="password-toggle"
+                                aria-label="Show password"
+                            >
+                                SHOW
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <div class="register-terms">
+                        <label>
+                            <input
+                                type="checkbox"
+                                id="registerTerms"
+                                required
+                            >
+                            <span>
+                                I agree to the JobPilot terms and privacy policy.
+                            </span>
+                        </label>
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        id="registerBtn"
+                        class="auth-submit"
+                    >
+                        CREATE ACCOUNT
+                    </button>
+
+                    <div
+                        id="registerMessage"
+                        class="auth-message"
+                        aria-live="polite"
+                    ></div>
+
+                </form>
+
+
+                <div class="auth-divider">
+                    <span>OR</span>
+                </div>
+
+
+                <button
+                    type="button"
+                    id="googleRegisterBtn"
+                    class="google-btn"
+                >
+                    <span class="google-icon">G</span>
+                    Continue with Google
+                </button>
+
+
+                <p class="auth-switch">
+                    Already have an account?
+                    <a href="login.html">Sign in</a>
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script src="js/app.js"></script>
+    <script type="module" src="js/auth.js"></script>
+
+</body>
+</html>

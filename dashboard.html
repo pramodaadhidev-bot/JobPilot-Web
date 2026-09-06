@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobPilot — Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* =========================================================
+           JOBPILOT DASHBOARD REDESIGN
+           Visual-only layer. Existing IDs/functionality preserved.
+           ========================================================= */
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 75% 0%, rgba(124,77,255,.10), transparent 30%),
+                radial-gradient(circle at 20% 70%, rgba(91,92,226,.07), transparent 28%),
+                #f7f7ff;
+        }
+
+        .dashboard {
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            box-sizing: border-box;
+            padding: 24px 15px;
+            background:
+                linear-gradient(180deg, #171535 0%, #211b4b 58%, #171535 100%);
+            border-right: 1px solid rgba(255,255,255,.05);
+        }
+
+        .sidebar-brand {
+            padding: 0 10px 25px;
+        }
+
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 13px;
+        }
+
+        .sidebar-profile {
+            padding: 13px 11px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255,255,255,.06);
+        }
+
+        .sidebar-nav {
+            gap: 6px;
+        }
+
+        .nav-item {
+            min-height: 45px;
+            box-sizing: border-box;
+            padding: 10px 13px;
+            border-radius: 12px;
+        }
+
+        .nav-item span:first-child {
+            width: 23px;
+            height: 23px;
+            font-size: 17px;
+            filter: none;
+        }
+
+        .nav-item.active {
+            background: linear-gradient(
+                100deg,
+                rgba(119,103,255,.96),
+                rgba(124,77,255,.68)
+            );
+            box-shadow: 0 9px 24px rgba(87,73,190,.22);
+        }
+
+        .dashboard-main {
+            padding: 34px 32px 50px;
+        }
+
+        .dashboard-header {
+            margin-bottom: 25px;
+        }
+
+        .welcome-label,
+        .section-eyebrow {
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: 1.2px;
+            font-size: 11px;
+        }
+
+        .dashboard-header h1 {
+            font-size: clamp(27px, 3vw, 36px);
+            letter-spacing: -.8px;
+            margin: 5px 0 8px;
+        }
+
+        .header-subtitle {
+            color: var(--muted);
+        }
+
+        .header-search {
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: #fff;
+            box-shadow: 0 8px 24px rgba(45,45,90,.06);
+            transition: .2s ease;
+        }
+
+        .header-search:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 28px rgba(45,45,90,.10);
+        }
+
+        /* Profile completion */
+
+        .completion-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 22px;
+            padding: 23px 25px;
+            background:
+                linear-gradient(110deg, #ffffff 0%, #f7f5ff 100%);
+            border: 1px solid #e6e3f5;
+            box-shadow: 0 12px 34px rgba(45,45,90,.07);
+            margin-bottom: 22px;
+        }
+
+        .completion-card::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -70px;
+            top: -80px;
+            border-radius: 50%;
+            background: rgba(124,77,255,.07);
+            pointer-events: none;
+        }
+
+        .completion-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #6d63e8, #8b5cf6);
+            color: white;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            box-shadow: 0 8px 20px rgba(91,92,226,.20);
+        }
+
+        .complete-btn {
+            position: relative;
+            z-index: 1;
+            border-radius: 12px;
+            background: var(--primary);
+            box-shadow: 0 8px 18px rgba(91,92,226,.20);
+        }
+
+        /* Statistics */
+
+        .stats-grid {
+            gap: 15px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 19px;
+            background: rgba(255,255,255,.96);
+            box-shadow: 0 9px 28px rgba(45,45,90,.055);
+            transition: .2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 32px rgba(45,45,90,.09);
+        }
+
+        .stat-icon {
+            border-radius: 13px;
+        }
+
+        .stat-card p {
+            color: var(--muted);
+        }
+
+        .stat-card h2 {
+            font-size: 25px;
+        }
+
+        /* Main sections */
+
+        .content-section {
+            margin-bottom: 26px;
+        }
+
+        .section-heading {
+            margin-bottom: 14px;
+        }
+
+        .section-heading h2 {
+            margin-top: 3px;
+            font-size: 21px;
+            letter-spacing: -.3px;
+        }
+
+        .section-heading > a,
+        .right-panel-header > a,
+        .right-section-title > a {
+            color: var(--primary);
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .activity-card {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 9px 28px rgba(45,45,90,.05);
+        }
+
+        /* Right panel */
+
+        .dashboard-right {
+            padding: 31px 25px 40px 0;
+        }
+
+        .right-panel-header {
+            margin-bottom: 15px;
+        }
+
+        .right-panel-header h2 {
+            margin-top: 3px;
+            font-size: 20px;
+        }
+
+        .profile-summary-card {
+            border-radius: 22px;
+            background:
+                linear-gradient(145deg, #ffffff, #f6f3ff);
+            border: 1px solid #e4e1f2;
+            box-shadow: 0 12px 32px rgba(45,45,90,.07);
+            padding: 23px;
+        }
+
+        .large-avatar {
+            width: 62px;
+            height: 62px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #625ce0, #935fe8);
+            box-shadow: 0 9px 22px rgba(91,92,226,.20);
+        }
+
+        .profile-summary-card h2 {
+            margin-bottom: 4px;
+        }
+
+        .profile-details {
+            border-top: 1px solid rgba(100,90,150,.10);
+            margin-top: 18px;
+            padding-top: 14px;
+        }
+
+        .profile-detail {
+            padding: 8px 0;
+        }
+
+        .right-section {
+            margin-top: 23px;
+            padding: 19px;
+            border: 1px solid var(--border);
+            border-radius: 19px;
+            background: rgba(255,255,255,.92);
+            box-shadow: 0 8px 24px rgba(45,45,90,.045);
+        }
+
+        .right-section-title {
+            margin-bottom: 13px;
+        }
+
+        .right-section-title h3 {
+            font-size: 15px;
+        }
+
+        .skills-list {
+            gap: 7px;
+        }
+
+        .skill-placeholder {
+            display: block;
+            line-height: 1.5;
+        }
+
+        .quick-action-card {
+            position: relative;
+            overflow: hidden;
+            margin-top: 23px;
+            border-radius: 21px;
+            padding: 22px;
+            background: linear-gradient(145deg, #514dcc, #744de1);
+            color: white;
+            box-shadow: 0 15px 32px rgba(81,77,204,.22);
+        }
+
+        .quick-action-card::after {
+            content: "";
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            right: -65px;
+            bottom: -80px;
+            background: rgba(255,255,255,.10);
+        }
+
+        .quick-action-icon {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: rgba(255,255,255,.15);
+            margin-bottom: 13px;
+        }
+
+        .quick-action-card h3,
+        .quick-action-card p,
+        .quick-action-card a {
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-action-card h3 {
+            color: white;
+        }
+
+        .quick-action-card p {
+            color: rgba(255,255,255,.76);
+            line-height: 1.55;
+        }
+
+        .quick-action-card a {
+            color: white;
+            font-weight: 800;
+        }
+
+        @media (max-width: 1100px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .dashboard-main {
+                padding: 28px 22px 45px;
+            }
+
+            .dashboard-right {
+                padding-right: 18px;
+            }
+        }
+
+        @media (max-width: 850px) {
+            .dashboard {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                min-height: 0;
+            }
+
+            .sidebar-nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-main {
+                padding: 24px 18px;
+            }
+
+            .dashboard-right {
+                padding: 0 18px 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .sidebar-nav {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                display: block;
+            }
+
+            .header-search {
+                margin-top: 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .completion-card {
+                padding: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">J</div>
+            <span>JobPilot</span>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="sidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="sidebarUserName">Loading...</div>
+                <div class="profile-email" id="sidebarUserEmail">Loading...</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-item active">
+                <span>⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="jobs.html" class="nav-item">
+                <span>⌕</span>
+                <span>Find Jobs</span>
+            </a>
+
+            <a href="recommendations.html" class="nav-item">
+                <span>✦</span>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="saved.html" class="nav-item">
+                <span>♡</span>
+                <span>Saved Jobs</span>
+            </a>
+
+            <a href="resume.html" class="nav-item">
+                <span>▣</span>
+                <span>Resume Analysis</span>
+            </a>
+
+            <a href="profile.html" class="nav-item">
+                <span>◎</span>
+                <span>My Profile</span>
+            </a>
+
+            <a href="settings.html" class="nav-item">
+                <span>⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="nav-item logout-btn" id="logoutBtn">
+                <span>↪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN -->
+    <main class="dashboard-main">
+
+        <header class="dashboard-header">
+
+            <div>
+                <p class="welcome-label">YOUR JOB SEARCH</p>
+
+                <h1>
+                    Welcome back,
+                    <span id="welcomeUserName">...</span>!
+                </h1>
+
+                <p class="header-subtitle">
+                    Find opportunities that match your skills and career goals.
+                </p>
+            </div>
+
+            <a href="jobs.html" class="header-search">
+                <span>⌕</span>
+                <span>Search for jobs...</span>
+            </a>
+
+        </header>
+
+
+        <!-- PROFILE COMPLETION -->
+        <section class="completion-card">
+
+            <div class="completion-info">
+
+                <div class="completion-icon">✦</div>
+
+                <div>
+                    <h2>Complete your profile</h2>
+                    <p>
+                        A complete profile helps JobPilot find better job matches for you.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="completion-progress">
+
+                <div class="progress-header">
+                    <span>Profile completion</span>
+                    <strong id="profileCompletion">0%</strong>
+                </div>
+
+                <div class="progress-track">
+                    <div
+                        class="progress-fill"
+                        id="profileProgress"
+                        style="width: 0%;">
+                    </div>
+                </div>
+
+            </div>
+
+            <a href="profile.html" class="complete-btn">
+                Complete Profile
+            </a>
+
+        </section>
+
+
+        <!-- STATISTICS -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon jobs-icon">⌕</div>
+                <div>
+                    <p>Jobs Found</p>
+                    <h2 id="jobsFound">0</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon match-icon">✦</div>
+                <div>
+                    <p>Recommended</p>
+                    <h2 id="recommendedCount">0</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon saved-icon">♡</div>
+                <div>
+                    <p>Saved Jobs</p>
+                    <h2 id="savedCount">0</h2>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon application-icon">✓</div>
+                <div>
+                    <p>Applications</p>
+                    <h2 id="applicationCount">0</h2>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- RECOMMENDED JOBS -->
+        <section class="content-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">FOR YOU</p>
+                    <h2>Recommended Jobs</h2>
+                </div>
+
+                <a href="recommendations.html">View all →</a>
+            </div>
+
+            <div id="recommendedJobs" class="job-list">
+
+                <div class="empty-state">
+                    <div class="empty-icon">✦</div>
+                    <h3>Loading recommendations...</h3>
+                    <p>
+                        JobPilot is finding opportunities based on your profile.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- RECENT ACTIVITY -->
+        <section class="content-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-eyebrow">ACTIVITY</p>
+                    <h2>Recent Applications</h2>
+                </div>
+            </div>
+
+            <div id="recentApplications" class="activity-card">
+
+                <div class="empty-state compact">
+                    <div class="empty-icon">✓</div>
+                    <h3>No recent applications</h3>
+                    <p>Your job applications will appear here.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- RIGHT PANEL -->
+    <aside class="dashboard-right">
+
+        <div class="right-panel-header">
+            <div>
+                <p class="section-eyebrow">YOUR PROFILE</p>
+                <h2>Profile Summary</h2>
+            </div>
+
+            <a href="profile.html">Edit</a>
+        </div>
+
+
+        <div class="profile-summary-card">
+
+            <div class="large-avatar" id="profileAvatar">U</div>
+
+            <h2 id="profileSummaryName">Loading...</h2>
+
+            <p id="profileSummaryEmail">Loading...</p>
+
+            <div class="profile-details">
+
+                <div class="profile-detail">
+                    <span>📍</span>
+                    <span id="profileLocation">Location not set</span>
+                </div>
+
+                <div class="profile-detail">
+                    <span>🎓</span>
+                    <span id="profileQualification">Qualification not set</span>
+                </div>
+
+                <div class="profile-detail">
+                    <span>💼</span>
+                    <span id="profileExperience">Experience not set</span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- SKILLS -->
+        <div class="right-section">
+
+            <div class="right-section-title">
+                <h3>Your Skills</h3>
+                <a href="profile.html">Edit</a>
+            </div>
+
+            <div id="profileSkills" class="skills-list">
+
+                <span class="skill-placeholder">
+                    Add skills to improve your matches
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- SAVED JOBS -->
+        <div class="right-section">
+
+            <div class="right-section-title">
+                <h3>Saved Jobs</h3>
+                <a href="saved.html">View all</a>
+            </div>
+
+            <div id="savedJobsPreview">
+
+                <div class="small-empty">
+                    No saved jobs yet.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- QUICK ACTION -->
+        <div class="quick-action-card">
+
+            <div class="quick-action-icon">✦</div>
+
+            <h3>Find your next opportunity</h3>
+
+            <p>
+                Explore jobs matched to your skills, experience and preferences.
+            </p>
+
+            <a href="jobs.html">
+                Explore Jobs →
+            </a>
+
+        </div>
+
+    </aside>
+
+</div>
+
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module">
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+const auth = getAuth();
+onAuthStateChanged(auth, function(user) {
+    if (!user) return;
+    const displayName = user.displayName || "User";
+    const email = user.email || "";
+    const initials = displayName.split(" ").filter(Boolean).map(function(part) { return part.charAt(0); }).join("").substring(0, 2).toUpperCase();
+    const sidebarName = document.getElementById("sidebarUserName");
+    const sidebarEmail = document.getElementById("sidebarUserEmail");
+    const welcomeName = document.getElementById("welcomeUserName");
+    const profileName = document.getElementById("profileSummaryName");
+    const profileEmail = document.getElementById("profileSummaryEmail");
+    const avatar = document.getElementById("sidebarAvatar");
+    const profileAvatar = document.getElementById("profileAvatar");
+    if (sidebarName) sidebarName.textContent = displayName;
+    if (sidebarEmail) sidebarEmail.textContent = email;
+    if (welcomeName) welcomeName.textContent = displayName;
+    if (profileName) profileName.textContent = displayName;
+    if (profileEmail) profileEmail.textContent = email;
+    if (avatar) avatar.textContent = initials || "U";
+    if (profileAvatar) profileAvatar.textContent = initials || "U";
+});
+</script>
+<script src="js/jobs.js"></script>
+
+</body>
+</html>

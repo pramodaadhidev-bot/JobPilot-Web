@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - JobPilot</title>
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .profile-page {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 8% 8%, rgba(124,77,255,.13), transparent 25%),
+                radial-gradient(circle at 92% 15%, rgba(91,92,226,.12), transparent 28%),
+                #f5f6fb;
+        }
+
+        .profile-main {
+            min-width: 0;
+            padding: 32px 34px 50px;
+            overflow: hidden;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 25px;
+        }
+
+        .profile-eyebrow {
+            margin: 0 0 7px;
+            color: #7775a0;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.4px;
+        }
+
+        .profile-header h1 {
+            margin: 0;
+            color: #1c1b38;
+            font-size: clamp(26px, 2.2vw, 32px);
+            line-height: 1.15;
+            letter-spacing: -.8px;
+        }
+
+        .profile-header p {
+            margin: 8px 0 0;
+            color: #77778d;
+            font-size: 13px;
+        }
+
+        .profile-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 15px;
+            border: 1px solid #e4e3ef;
+            border-radius: 12px;
+            background: #fff;
+            color: #5b5ce2;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            box-shadow: 0 7px 20px rgba(45,45,90,.06);
+        }
+
+        .profile-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .profile-card,
+        .profile-side-card {
+            background: rgba(255,255,255,.97);
+            border: 1px solid #e7e6f0;
+            border-radius: 22px;
+            box-shadow: 0 14px 38px rgba(45,45,90,.07);
+        }
+
+        .profile-card {
+            padding: 27px;
+        }
+
+        .profile-identity {
+            display: flex;
+            align-items: center;
+            gap: 17px;
+            padding-bottom: 23px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid #ecebf3;
+        }
+
+        .profile-big-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #5b5ce2, #8b5cf6);
+            color: #fff;
+            font-size: 25px;
+            font-weight: 900;
+            box-shadow: 0 10px 25px rgba(91,92,226,.2);
+        }
+
+        .profile-identity h2 {
+            margin: 0 0 5px;
+            color: #1c1b38;
+            font-size: 21px;
+        }
+
+        .profile-identity p {
+            margin: 0;
+            color: #77778d;
+            font-size: 13px;
+        }
+
+        .profile-section-title {
+            margin-bottom: 20px;
+        }
+
+        .profile-section-title h2 {
+            margin: 0;
+            color: #1c1b38;
+            font-size: 19px;
+        }
+
+        .profile-section-title p {
+            margin: 6px 0 0;
+            color: #77778d;
+            font-size: 12px;
+        }
+
+        .profile-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .profile-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .profile-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .profile-field label {
+            color: #30304b;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .profile-field input,
+        .profile-field select {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 13px;
+            border: 1px solid #dedeea;
+            border-radius: 12px;
+            background: #fff;
+            color: #292940;
+            font: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: .2s ease;
+        }
+
+        .profile-field input:focus,
+        .profile-field select:focus {
+            border-color: #5b5ce2;
+            box-shadow: 0 0 0 4px rgba(91,92,226,.09);
+        }
+
+        .profile-field small {
+            color: #85859a;
+            font-size: 10px;
+        }
+
+        .profile-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 3px;
+        }
+
+        .profile-save-btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 21px;
+            background: linear-gradient(135deg, #5b5ce2, #7c4dff);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 9px 22px rgba(91,92,226,.2);
+            transition: .2s ease;
+        }
+
+        .profile-save-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .profile-message {
+            grid-column: 1 / -1;
+            display: none;
+            padding: 11px 13px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .profile-message.success {
+            display: block;
+            background: #eafaf4;
+            color: #147a59;
+        }
+
+        .profile-side-card {
+            padding: 23px;
+            background:
+                radial-gradient(circle at 100% 0%, rgba(124,77,255,.10), transparent 42%),
+                #fff;
+        }
+
+        .profile-side-icon {
+            width: 45px;
+            height: 45px;
+            display: grid;
+            place-items: center;
+            margin-bottom: 15px;
+            border-radius: 14px;
+            background: #eeedff;
+            color: #5b5ce2;
+            font-size: 20px;
+        }
+
+        .profile-side-card h3 {
+            margin: 0;
+            color: #1c1b38;
+            font-size: 17px;
+        }
+
+        .profile-side-card > p {
+            margin: 8px 0 20px;
+            color: #77778d;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .profile-check-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .profile-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #36364f;
+            font-size: 12px;
+            font-weight: 650;
+        }
+
+        .profile-check-icon {
+            width: 27px;
+            height: 27px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border-radius: 9px;
+            background: #f0efff;
+            color: #5b5ce2;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 1200px) {
+            .profile-layout {
+                grid-template-columns: minmax(0, 1fr) 270px;
+            }
+
+            .profile-main {
+                padding-left: 27px;
+                padding-right: 27px;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .profile-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-side-card {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .profile-main {
+                padding: 23px 16px 40px;
+            }
+
+            .profile-header {
+                flex-direction: column;
+            }
+
+            .profile-back {
+                align-self: flex-start;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .profile-card {
+                padding: 20px;
+                border-radius: 18px;
+            }
+
+            .profile-form {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-field.full,
+            .profile-actions,
+            .profile-message {
+                grid-column: auto;
+            }
+
+            .profile-actions {
+                justify-content: stretch;
+            }
+
+            .profile-save-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="profile-page">
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">J</div>
+            <span>JobPilot</span>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="profileSidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="profileSidebarUserName">Loading...</div>
+                <div class="profile-email" id="profileSidebarUserEmail">Loading...</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="dashboard.html" class="nav-item">
+                <span>⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="jobs.html" class="nav-item">
+                <span>⌕</span>
+                <span>Find Jobs</span>
+            </a>
+
+            <a href="recommendations.html" class="nav-item">
+                <span>✦</span>
+                <span>Recommendations</span>
+            </a>
+
+            <a href="saved.html" class="nav-item">
+                <span>♡</span>
+                <span>Saved Jobs</span>
+            </a>
+
+            <a href="resume.html" class="nav-item">
+                <span>▣</span>
+                <span>Resume Analysis</span>
+            </a>
+
+            <a href="profile.html" class="nav-item active">
+                <span>◎</span>
+                <span>My Profile</span>
+            </a>
+
+            <a href="settings.html" class="nav-item">
+                <span>⚙</span>
+                <span>Settings</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="nav-item logout-btn" id="profileLogoutBtn">
+                <span>↪</span>
+                <span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="profile-main">
+
+        <header class="profile-header">
+            <div>
+                <p class="profile-eyebrow">YOUR CAREER PROFILE</p>
+                <h1>My Profile</h1>
+                <p>Keep your career preferences updated for better job matches.</p>
+            </div>
+
+            <a href="dashboard.html" class="profile-back">
+                ← Dashboard
+            </a>
+        </header>
+
+        <div class="profile-layout">
+
+            <section class="profile-card">
+
+                <div class="profile-identity">
+                    <div class="profile-big-avatar" id="profileBigAvatar">U</div>
+
+                    <div>
+                        <h2 id="profileName">Loading...</h2>
+                        <p id="profileEmail">Loading...</p>
+                    </div>
+                </div>
+
+                <div class="profile-section-title">
+                    <h2>Career preferences</h2>
+                    <p>These details help JobPilot find jobs that fit you better.</p>
+                </div>
+
+                <form class="profile-form" id="profileForm">
+
+                    <div class="profile-field full">
+                        <label for="profileSkills">🛠️ Skills</label>
+                        <input
+                            type="text"
+                            id="profileSkills"
+                            placeholder="e.g. Java, Python, SQL, React"
+                            autocomplete="off"
+                        >
+                        <small>Separate multiple skills with commas.</small>
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileQualification">🎓 Qualification</label>
+                        <input
+                            type="text"
+                            id="profileQualification"
+                            placeholder="e.g. B.Tech Computer Science"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileExperience">💼 Experience</label>
+                        <input
+                            type="text"
+                            id="profileExperience"
+                            placeholder="e.g. Fresher or 2 years"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileLocation">📍 Preferred location</label>
+                        <input
+                            type="text"
+                            id="profileLocation"
+                            placeholder="e.g. Kochi, Kerala"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileSalary">💰 Expected salary</label>
+                        <input
+                            type="text"
+                            id="profileSalary"
+                            placeholder="e.g. ₹6 LPA"
+                        >
+                    </div>
+
+                    <div class="profile-field">
+                        <label for="profileJobType">🏢 Preferred job type</label>
+                        <select id="profileJobType">
+                            <option value="">Any job type</option>
+                            <option value="full-time">Full-time</option>
+                            <option value="part-time">Part-time</option>
+                            <option value="contract">Contract</option>
+                            <option value="internship">Internship</option>
+                        </select>
+                    </div>
+
+                    <div class="profile-message" id="profileMessage"></div>
+
+                    <div class="profile-actions">
+                        <button type="submit" class="profile-save-btn">
+                            Save Profile
+                        </button>
+                    </div>
+
+                </form>
+
+            </section>
+
+            <aside class="profile-side-card">
+
+                <div class="profile-side-icon">✦</div>
+
+                <h3>Complete your profile</h3>
+
+                <p>
+                    A complete profile helps JobPilot understand what you're
+                    looking for and find more relevant opportunities.
+                </p>
+
+                <div class="profile-check-list">
+
+                    <div class="profile-check">
+                        <span class="profile-check-icon">✓</span>
+                        <span>Add your skills</span>
+                    </div>
+
+                    <div class="profile-check">
+                        <span class="profile-check-icon">✓</span>
+                        <span>Add your qualification</span>
+                    </div>
+
+                    <div class="profile-check">
+                        <span class="profile-check-icon">✓</span>
+                        <span>Set preferred location</span>
+                    </div>
+
+                    <div class="profile-check">
+                        <span class="profile-check-icon">✓</span>
+                        <span>Set experience level</span>
+                    </div>
+
+                    <div class="profile-check">
+                        <span class="profile-check-icon">✓</span>
+                        <span>Choose job type</span>
+                    </div>
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script type="module" src="js/auth.js"></script>
+
+<script type="module">
+    import { getAuth, onAuthStateChanged }
+        from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+    const auth = getAuth();
+
+    const form = document.getElementById("profileForm");
+
+    const skills = document.getElementById("profileSkills");
+    const qualification = document.getElementById("profileQualification");
+    const experience = document.getElementById("profileExperience");
+    const location = document.getElementById("profileLocation");
+    const salary = document.getElementById("profileSalary");
+    const jobType = document.getElementById("profileJobType");
+    const message = document.getElementById("profileMessage");
+
+    function getInitials(name) {
+        if (!name) {
+            return "U";
+        }
+
+        const parts = name.trim().split(/\s+/);
+
+        if (parts.length === 1) {
+            return parts[0].charAt(0).toUpperCase();
+        }
+
+        return (
+            parts[0].charAt(0) +
+            parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+    }
+
+    function profileKey(uid) {
+        return "jobpilot_profile_" + uid;
+    }
+
+    function loadProfile(user) {
+        const saved = localStorage.getItem(profileKey(user.uid));
+
+        if (!saved) {
+            return;
+        }
+
+        try {
+            const data = JSON.parse(saved);
+
+            skills.value = data.skills || "";
+            qualification.value = data.qualification || "";
+            experience.value = data.experience || "";
+            location.value = data.preferredLocation || "";
+            salary.value = data.expectedSalary || "";
+            jobType.value = data.jobType || "";
+        } catch (error) {
+            console.error("Unable to load profile:", error);
+        }
+    }
+
+    onAuthStateChanged(auth, function (user) {
+
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const name = user.displayName || "User";
+        const email = user.email || "";
+        const initials = getInitials(name);
+
+        document.getElementById("profileName").textContent = name;
+        document.getElementById("profileEmail").textContent = email;
+
+        document.getElementById("profileSidebarUserName").textContent = name;
+        document.getElementById("profileSidebarUserEmail").textContent = email;
+
+        document.getElementById("profileBigAvatar").textContent = initials;
+        document.getElementById("profileSidebarAvatar").textContent = initials;
+
+        loadProfile(user);
+    });
+
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const user = auth.currentUser;
+
+        if (!user) {
+            return;
+        }
+
+        const data = {
+            skills: skills.value.trim(),
+            qualification: qualification.value.trim(),
+            experience: experience.value.trim(),
+            preferredLocation: location.value.trim(),
+            expectedSalary: salary.value.trim(),
+            jobType: jobType.value,
+            updatedAt: new Date().toISOString()
+        };
+
+        localStorage.setItem(
+            profileKey(user.uid),
+            JSON.stringify(data)
+        );
+
+        message.textContent = "✓ Profile saved successfully.";
+        message.className = "profile-message success";
+
+        setTimeout(function () {
+            message.style.display = "none";
+        }, 3000);
+    });
+
+    document.getElementById("profileLogoutBtn").addEventListener(
+        "click",
+        async function () {
+
+            if (window.JobPilotAuth && window.JobPilotAuth.auth) {
+                await window.JobPilotAuth.auth.signOut();
+            } else {
+                await auth.signOut();
+            }
+
+            window.location.href = "login.html";
+        }
+    );
+</script>
+
+</body>
+</html>
+

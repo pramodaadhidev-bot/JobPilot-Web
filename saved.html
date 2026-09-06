@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saved Jobs | JobPilot</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.saved-page {
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 12% 10%, rgba(124,77,255,.12), transparent 30%),
+        radial-gradient(circle at 90% 85%, rgba(91,92,226,.12), transparent 32%),
+        #f7f7ff;
+}
+
+.saved-main {
+    min-width: 0;
+    padding: 34px 38px 50px;
+}
+
+.saved-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.saved-eyebrow {
+    margin: 0 0 7px;
+    color: #5b5ce2;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+}
+
+.saved-header h1 {
+    margin: 0;
+    color: #17172b;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -.035em;
+}
+
+.saved-header p {
+    margin: 10px 0 0;
+    color: #6b6b83;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.saved-count-card {
+    min-width: 145px;
+    padding: 15px 18px;
+    border: 1px solid #e7e6f4;
+    border-radius: 18px;
+    background: rgba(255,255,255,.86);
+    box-shadow: 0 10px 30px rgba(41,36,96,.08);
+    text-align: center;
+}
+
+.saved-count-card strong {
+    display: block;
+    color: #5b5ce2;
+    font-size: 25px;
+    line-height: 1;
+}
+
+.saved-count-card span {
+    display: block;
+    margin-top: 6px;
+    color: #77778e;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.saved-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+}
+
+.saved-refresh {
+    border: 1px solid #deddf0;
+    border-radius: 12px;
+    background: #fff;
+    color: #4d4d68;
+    padding: 10px 15px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.saved-refresh:hover {
+    border-color: #bcbcf0;
+    color: #5b5ce2;
+    transform: translateY(-1px);
+}
+
+#jobsResults {
+    min-width: 0;
+}
+
+.saved-empty {
+    max-width: 620px;
+    margin: 65px auto;
+    padding: 50px 30px;
+    border: 1px solid #e7e6f4;
+    border-radius: 26px;
+    background: rgba(255,255,255,.9);
+    box-shadow: 0 18px 50px rgba(41,36,96,.08);
+    text-align: center;
+}
+
+.saved-empty-icon {
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #eeeaff, #f5f2ff);
+    color: #5b5ce2;
+    font-size: 32px;
+}
+
+.saved-empty h2 {
+    margin: 0;
+    color: #20203a;
+    font-size: 23px;
+}
+
+.saved-empty p {
+    max-width: 460px;
+    margin: 11px auto 22px;
+    color: #77778e;
+    font-size: 14px;
+    line-height: 1.65;
+}
+
+.saved-find-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 11px 18px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #5b5ce2, #7c4dff);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    box-shadow: 0 10px 22px rgba(91,92,226,.22);
+}
+
+.saved-status {
+    display: none;
+    margin-bottom: 18px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    background: #fff;
+    color: #6b6b83;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Keep the same compact left sidebar used on Dashboard/Profile */
+@media (max-width: 800px) {
+    .dashboard {
+        display: grid !important;
+        grid-template-columns: 82px minmax(0, 1fr) !important;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        width: 82px !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        padding: 18px 8px !important;
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .sidebar-brand {
+        justify-content: center !important;
+        padding-bottom: 18px !important;
+    }
+
+    .brand-text {
+        display: none !important;
+    }
+
+    .sidebar-profile {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 10px 0 18px !important;
+    }
+
+    .profile-avatar {
+        margin: 0 auto 7px !important;
+    }
+
+    .profile-name,
+    .profile-email {
+        display: none !important;
+    }
+
+    .sidebar-nav {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 7px !important;
+        overflow: visible !important;
+    }
+
+    .nav-item {
+        width: 100% !important;
+        min-height: 46px !important;
+        padding: 10px 5px !important;
+        justify-content: center !important;
+        flex: none !important;
+    }
+
+    .nav-item span:last-child {
+        display: none !important;
+    }
+
+    .nav-item span:first-child {
+        margin: 0 !important;
+    }
+
+    .sidebar-bottom {
+        display: block !important;
+        margin-top: auto !important;
+        padding-top: 12px !important;
+    }
+
+    .logout-btn {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    .saved-main {
+        padding: 22px 14px 35px !important;
+    }
+
+    .saved-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .saved-count-card {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard {
+        grid-template-columns: 72px minmax(0, 1fr) !important;
+    }
+
+    .sidebar {
+        width: 72px !important;
+        padding-left: 6px !important;
+        padding-right: 6px !important;
+    }
+
+    .saved-main {
+        padding-left: 11px !important;
+        padding-right: 11px !important;
+    }
+}
+</style>
+</head>
+
+<body class="saved-page">
+
+<div class="dashboard">
+
+<aside class="sidebar">
+
+    <div class="sidebar-brand">
+        <div class="brand-icon">✦</div>
+        <div class="brand-text">
+            <div class="brand-name">JobPilot</div>
+            <div class="brand-tagline">Career, simplified.</div>
+        </div>
+    </div>
+
+    <div class="sidebar-profile">
+        <div class="profile-avatar" id="savedSidebarAvatar">U</div>
+        <div class="profile-name" id="savedSidebarUserName">Loading...</div>
+        <div class="profile-email" id="savedSidebarUserEmail">...</div>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a class="nav-item" href="dashboard.html">
+            <span>⌂</span><span>Dashboard</span>
+        </a>
+
+        <a class="nav-item" href="jobs.html">
+            <span>⌕</span><span>Find Jobs</span>
+        </a>
+
+        <a class="nav-item" href="recommendations.html">
+            <span>✦</span><span>Recommendations</span>
+        </a>
+
+        <a class="nav-item active" href="saved.html">
+            <span>♡</span><span>Saved Jobs</span>
+        </a>
+
+        <a class="nav-item" href="resume.html">
+            <span>▣</span><span>Resume Analysis</span>
+        </a>
+
+        <a class="nav-item" href="profile.html">
+            <span>◎</span><span>My Profile</span>
+        </a>
+
+        <a class="nav-item" href="settings.html">
+            <span>⚙</span><span>Settings</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+        <button class="logout-btn" id="savedLogoutBtn">
+            <span>↪</span><span>Logout</span>
+        </button>
+    </div>
+
+</aside>
+
+<main class="saved-main">
+
+    <header class="saved-header">
+        <div>
+            <p class="saved-eyebrow">Your shortlist</p>
+            <h1>Saved Jobs</h1>
+            <p>Keep the opportunities you want to come back to in one place.</p>
+        </div>
+
+        <div class="saved-count-card">
+            <strong id="savedCount">0</strong>
+            <span>Saved jobs</span>
+        </div>
+    </header>
+
+    <div class="saved-toolbar">
+        <button type="button" class="saved-refresh" id="refreshSavedJobs">
+            ↻ Refresh
+        </button>
+    </div>
+
+    <div class="saved-status" id="savedStatus"></div>
+
+    <div id="jobsResults"></div>
+
+</main>
+
+</div>
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/jobs.js"></script>
+
+<script type="module">
+import { getAuth, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const auth = getAuth();
+
+const sidebarAvatar =
+    document.getElementById("savedSidebarAvatar");
+
+const sidebarName =
+    document.getElementById("savedSidebarUserName");
+
+const sidebarEmail =
+    document.getElementById("savedSidebarUserEmail");
+
+const logoutButton =
+    document.getElementById("savedLogoutBtn");
+
+const savedCount =
+    document.getElementById("savedCount");
+
+const jobsResults =
+    document.getElementById("jobsResults");
+
+const savedStatus =
+    document.getElementById("savedStatus");
+
+const refreshButton =
+    document.getElementById("refreshSavedJobs");
+
+function getSavedJobs() {
+    try {
+        return JSON.parse(
+            localStorage.getItem("jobpilot_saved_jobs") || "[]"
+        );
+    } catch (error) {
+        return [];
+    }
+}
+
+function getSaveId(job) {
+    return String(
+        job._save_id ||
+        job.id ||
+        job.redirect_url ||
+        job.title ||
+        ""
+    );
+}
+
+function escapeHtml(value) {
+    return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function showEmpty() {
+    jobsResults.innerHTML =
+        '<div class="saved-empty">' +
+            '<div class="saved-empty-icon">♡</div>' +
+            '<h2>No saved jobs yet</h2>' +
+            '<p>When you find an opportunity you like, tap Save Job and it will appear here for easy access later.</p>' +
+            '<a class="saved-find-btn" href="jobs.html">Find Jobs&nbsp; →</a>' +
+        '</div>';
+}
+
+function showStatus(message) {
+    savedStatus.textContent = message;
+    savedStatus.style.display = "block";
+}
+
+function hideStatus() {
+    savedStatus.textContent = "";
+    savedStatus.style.display = "none";
+}
+
+function removeSavedJob(job) {
+    const id = getSaveId(job);
+
+    let savedJobs = getSavedJobs();
+
+    savedJobs = savedJobs.filter(function(savedJob) {
+        return getSaveId(savedJob) !== id;
+    });
+
+    localStorage.setItem(
+        "jobpilot_saved_jobs",
+        JSON.stringify(savedJobs)
+    );
+
+    loadSavedJobs();
+}
+
+function renderSavedJobs() {
+    const savedJobs = getSavedJobs();
+
+    savedCount.textContent = String(savedJobs.length);
+
+    if (!savedJobs.length) {
+        showEmpty();
+        return;
+    }
+
+    if (
+        window.JobPilotJobs &&
+        typeof window.JobPilotJobs.renderJobs === "function"
+    ) {
+        window.JobPilotJobs.renderJobs(savedJobs);
+
+        const buttons =
+            jobsResults.querySelectorAll(".job-save-button");
+
+        buttons.forEach(function(button, index) {
+            button.addEventListener("click", function() {
+                removeSavedJob(savedJobs[index]);
+            });
+        });
+
+        return;
+    }
+
+    showStatus(
+        "The saved job display is not ready. Please refresh the page."
+    );
+}
+
+function loadSavedJobs() {
+    hideStatus();
+    renderSavedJobs();
+}
+
+onAuthStateChanged(auth, function(user) {
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const displayName = user.displayName || "User";
+    const email = user.email || "";
+
+    const initials =
+        displayName
+            .split(" ")
+            .filter(Boolean)
+            .map(function(part) {
+                return part.charAt(0);
+            })
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
+
+    sidebarName.textContent = displayName;
+    sidebarEmail.textContent = email;
+    sidebarAvatar.textContent = initials || "U";
+
+    loadSavedJobs();
+});
+
+if (refreshButton) {
+    refreshButton.addEventListener(
+        "click",
+        loadSavedJobs
+    );
+}
+
+if (logoutButton) {
+    logoutButton.addEventListener(
+        "click",
+        async function() {
+            try {
+                await signOut(auth);
+                window.location.href = "login.html";
+            } catch (error) {
+                console.error("Logout error:", error);
+            }
+        }
+    );
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis - JobPilot</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <style>
+        .resume-main {
+            min-width: 0;
+            padding: 34px;
+            background:
+                radial-gradient(circle at 85% 8%, rgba(124,77,255,.10), transparent 28%),
+                radial-gradient(circle at 15% 90%, rgba(91,92,226,.08), transparent 30%),
+                #f7f7ff;
+            min-height: 100vh;
+        }
+
+        .resume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 26px;
+        }
+
+        .resume-header h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.15;
+            color: #17172b;
+        }
+
+        .resume-header p {
+            margin: 8px 0 0;
+            color: #6b6b83;
+            font-size: 14px;
+        }
+
+        .resume-back {
+            text-decoration: none;
+            color: #5b5ce2;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .resume-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 310px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .resume-card {
+            background: #fff;
+            border: 1px solid #e9e9f2;
+            border-radius: 22px;
+            box-shadow: 0 14px 40px rgba(42,38,100,.08);
+            padding: 26px;
+        }
+
+        .resume-card h2 {
+            margin: 0;
+            color: #17172b;
+            font-size: 20px;
+        }
+
+        .resume-card-subtitle {
+            margin: 7px 0 22px;
+            color: #77778e;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .resume-dropzone {
+            border: 2px dashed #c9c9ed;
+            border-radius: 18px;
+            background: linear-gradient(145deg, #fafaff, #f5f4ff);
+            padding: 34px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .resume-dropzone:hover,
+        .resume-dropzone.dragover {
+            border-color: #6b5ce7;
+            background: #f3f1ff;
+            transform: translateY(-1px);
+        }
+
+        .resume-upload-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 14px;
+            border-radius: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg,#5b5ce2,#7c4dff);
+            color: #fff;
+            font-size: 25px;
+            box-shadow: 0 10px 25px rgba(91,92,226,.25);
+        }
+
+        .resume-dropzone strong {
+            display: block;
+            color: #292947;
+            font-size: 15px;
+        }
+
+        .resume-dropzone span {
+            display: block;
+            margin-top: 7px;
+            color: #88889e;
+            font-size: 12px;
+        }
+
+        #resumeFile {
+            display: none;
+        }
+
+        .resume-file-info {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 13px 15px;
+            border: 1px solid #e7e7f2;
+            border-radius: 14px;
+            background: #fafaff;
+        }
+
+        .resume-file-info.visible {
+            display: flex;
+        }
+
+        .resume-file-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eeedff;
+            color: #5b5ce2;
+        }
+
+        .resume-file-details {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .resume-file-name {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            color: #252542;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .resume-file-size {
+            display: block;
+            margin-top: 3px;
+            color: #88889e;
+            font-size: 11px;
+        }
+
+        .resume-analyze-btn {
+            width: 100%;
+            margin-top: 18px;
+            border: 0;
+            border-radius: 13px;
+            padding: 14px 18px;
+            background: linear-gradient(135deg,#5b5ce2,#7c4dff);
+            color: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(91,92,226,.20);
+            transition: .2s ease;
+        }
+
+        .resume-analyze-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .resume-analyze-btn:disabled {
+            opacity: .65;
+            cursor: wait;
+            transform: none;
+        }
+
+        .resume-results {
+            display: none;
+            margin-top: 22px;
+        }
+
+        .resume-results.visible {
+            display: block;
+        }
+
+        .resume-result-message {
+            padding: 14px 16px;
+            border-radius: 13px;
+            background: #f4f3ff;
+            color: #4e4c78;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .resume-detected {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(2,minmax(0,1fr));
+            gap: 13px;
+        }
+
+        .resume-field {
+            padding: 15px;
+            border: 1px solid #ececf4;
+            border-radius: 15px;
+            background: #fff;
+        }
+
+        .resume-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .resume-field label {
+            display: block;
+            margin-bottom: 7px;
+            color: #85859b;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        .resume-field input,
+        .resume-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e5e5ef;
+            border-radius: 10px;
+            padding: 10px 11px;
+            color: #292947;
+            background: #fafaff;
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .resume-field textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
+
+        .resume-field input:focus,
+        .resume-field textarea:focus {
+            border-color: #7772e8;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(91,92,226,.08);
+        }
+
+        .resume-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .resume-apply-btn,
+        .resume-edit-btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 12px 17px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .resume-apply-btn {
+            color: #fff;
+            background: #20b486;
+        }
+
+        .resume-edit-btn {
+            color: #5b5ce2;
+            background: #eeedff;
+        }
+
+        .resume-side-card {
+            background: linear-gradient(150deg,#211b4b,#342b72);
+            color: #fff;
+            border-radius: 22px;
+            padding: 23px;
+            box-shadow: 0 14px 35px rgba(35,29,78,.18);
+        }
+
+        .resume-side-card h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .resume-side-card p {
+            margin: 8px 0 20px;
+            color: rgba(255,255,255,.68);
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .resume-step {
+            display: flex;
+            gap: 11px;
+            margin-top: 15px;
+        }
+
+        .resume-step-number {
+            flex: 0 0 28px;
+            height: 28px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .resume-step strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .resume-step span {
+            display: block;
+            margin-top: 3px;
+            color: rgba(255,255,255,.58);
+            font-size: 11px;
+            line-height: 1.45;
+        }
+
+        .resume-info-card {
+            margin-top: 18px;
+            background: #fff;
+            border: 1px solid #e9e9f2;
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 12px 30px rgba(42,38,100,.06);
+        }
+
+        .resume-info-card h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            color: #292947;
+        }
+
+        .resume-info-card p {
+            margin: 0;
+            color: #77778e;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .resume-success {
+            margin-top: 12px;
+            color: #168362;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 1050px) {
+            .resume-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .resume-side-column {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 18px;
+            }
+
+            .resume-info-card {
+                margin-top: 0;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .resume-main {
+                padding: 20px 14px 35px;
+            }
+
+            .resume-header {
+                align-items: flex-start;
+            }
+
+            .resume-header h1 {
+                font-size: 25px;
+            }
+
+            .resume-side-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .resume-detected {
+                grid-template-columns: 1fr;
+            }
+
+            .resume-field.full {
+                grid-column: auto;
+            }
+
+            .resume-card {
+                padding: 18px;
+            }
+
+            .resume-actions {
+                flex-direction: column;
+            }
+
+            .resume-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">✦</div>
+            <div>
+                <div class="brand-text">JobPilot</div>
+                <div class="brand-tagline">Career, simplified.</div>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="resumeSidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="resumeSidebarUserName">Loading...</div>
+                <div class="profile-email" id="resumeSidebarUserEmail">Loading...</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span>⌂</span><span>Dashboard</span>
+            </a>
+
+            <a href="jobs.html" class="nav-item">
+                <span>⌕</span><span>Find Jobs</span>
+            </a>
+
+            <a href="recommendations.html" class="nav-item">
+                <span>✦</span><span>Recommendations</span>
+            </a>
+
+            <a href="saved.html" class="nav-item">
+                <span>♡</span><span>Saved Jobs</span>
+            </a>
+
+            <a href="resume.html" class="nav-item active">
+                <span>▣</span><span>Resume Analysis</span>
+            </a>
+
+            <a href="profile.html" class="nav-item">
+                <span>◎</span><span>My Profile</span>
+            </a>
+
+            <a href="settings.html" class="nav-item">
+                <span>⚙</span><span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="logout-btn" id="resumeLogoutBtn">
+                <span>↪</span><span>Logout</span>
+            </button>
+        </div>
+
+    </aside>
+
+    <main class="resume-main">
+
+        <div class="resume-header">
+            <div>
+                <h1>Resume Analysis</h1>
+                <p>Extract useful information from your resume and review it before updating your profile.</p>
+            </div>
+
+            <a href="dashboard.html" class="resume-back">← Dashboard</a>
+        </div>
+
+        <div class="resume-layout">
+
+            <section class="resume-card">
+
+                <h2>Upload your resume</h2>
+
+                <p class="resume-card-subtitle">
+                    Upload a PDF or text resume. JobPilot will extract information that can help improve your job recommendations.
+                </p>
+
+                <div class="resume-dropzone" id="resumeDropzone">
+                    <div class="resume-upload-icon">↑</div>
+                    <strong>Drop your resume here or click to browse</strong>
+                    <span>Supported: PDF, DOC, DOCX and TXT</span>
+                    <input type="file" id="resumeFile" accept=".pdf,.doc,.docx,.txt">
+                </div>
+
+                <div class="resume-file-info" id="resumeFileInfo">
+                    <div class="resume-file-icon">▣</div>
+                    <div class="resume-file-details">
+                        <span class="resume-file-name" id="resumeFileName"></span>
+                        <span class="resume-file-size" id="resumeFileSize"></span>
+                    </div>
+                </div>
+
+                <button type="button" class="resume-analyze-btn" id="resumeAnalyzeBtn" disabled>
+                    Analyze Resume
+                </button>
+
+                <div class="resume-results" id="resumeResults">
+
+                    <div class="resume-result-message" id="resumeResultMessage">
+                        Ready to analyze your resume.
+                    </div>
+
+                    <div id="resumeAnalysisDetails" style="display:none;">
+
+                        <div class="resume-detected">
+
+                            <div class="resume-field">
+                                <label>Name</label>
+                                <input id="resumeDetectedName" type="text">
+                            </div>
+
+                            <div class="resume-field">
+                                <label>Email</label>
+                                <input id="resumeDetectedEmail" type="text">
+                            </div>
+
+                            <div class="resume-field">
+                                <label>Phone</label>
+                                <input id="resumeDetectedPhone" type="text">
+                            </div>
+
+                            <div class="resume-field">
+                                <label>Qualification</label>
+                                <input id="resumeDetectedQualification" type="text">
+                            </div>
+
+                            <div class="resume-field">
+                                <label>Experience</label>
+                                <input id="resumeDetectedExperience" type="text">
+                            </div>
+
+                            <div class="resume-field">
+                                <label>Location</label>
+                                <input id="resumeDetectedLocation" type="text">
+                            </div>
+
+                            <div class="resume-field full">
+                                <label>Skills</label>
+                                <textarea id="resumeDetectedSkills"></textarea>
+                            </div>
+
+                        </div>
+
+                        <div class="resume-actions">
+                            <button type="button" class="resume-apply-btn" id="resumeApplyBtn">
+                                ✓ Apply to Profile
+                            </button>
+
+                            <button type="button" class="resume-edit-btn" id="resumeEditBtn">
+                                ✎ Edit Information
+                            </button>
+                        </div>
+
+                        <div class="resume-success" id="resumeSuccess"></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <aside class="resume-side-column">
+
+                <div class="resume-side-card">
+
+                    <h3>How it works</h3>
+
+                    <p>
+                        Your resume is processed in the browser and the detected information is shown for your review.
+                    </p>
+
+                    <div class="resume-step">
+                        <div class="resume-step-number">1</div>
+                        <div>
+                            <strong>Upload</strong>
+                            <span>Select your resume file.</span>
+                        </div>
+                    </div>
+
+                    <div class="resume-step">
+                        <div class="resume-step-number">2</div>
+                        <div>
+                            <strong>Analyze</strong>
+                            <span>Extract skills and profile information.</span>
+                        </div>
+                    </div>
+
+                    <div class="resume-step">
+                        <div class="resume-step-number">3</div>
+                        <div>
+                            <strong>Review</strong>
+                            <span>Check and edit detected information.</span>
+                        </div>
+                    </div>
+
+                    <div class="resume-step">
+                        <div class="resume-step-number">4</div>
+                        <div>
+                            <strong>Apply</strong>
+                            <span>Update your JobPilot profile only after confirmation.</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="resume-info-card">
+                    <h3>💡 Tip</h3>
+                    <p>
+                        A text-based PDF gives the most reliable extraction results. Scanned image-only PDFs may not contain selectable text.
+                    </p>
+                </div>
+
+            </aside>
+
+        </div>
+
+    </main>
+</div>
+
+<script src="js/app.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script src="js/jobs.js"></script>
+
+<script type="module">
+import { getAuth, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+const auth = getAuth();
+
+const dropzone = document.getElementById("resumeDropzone");
+const fileInput = document.getElementById("resumeFile");
+const fileInfo = document.getElementById("resumeFileInfo");
+const fileName = document.getElementById("resumeFileName");
+const fileSize = document.getElementById("resumeFileSize");
+const analyzeButton = document.getElementById("resumeAnalyzeBtn");
+const results = document.getElementById("resumeResults");
+const resultMessage = document.getElementById("resumeResultMessage");
+const details = document.getElementById("resumeAnalysisDetails");
+const applyButton = document.getElementById("resumeApplyBtn");
+const editButton = document.getElementById("resumeEditBtn");
+const successMessage = document.getElementById("resumeSuccess");
+const logoutButton = document.getElementById("resumeLogoutBtn");
+
+let selectedResumeFile = null;
+let currentUser = null;
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) {
+        return bytes + " B";
+    }
+
+    if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + " KB";
+    }
+
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+}
+
+function getInitials(name) {
+    const parts = String(name || "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    if (!parts.length) {
+        return "U";
+    }
+
+    return parts
+        .map(function(part) {
+            return part.charAt(0);
+        })
+        .join("")
+        .substring(0, 2)
+        .toUpperCase();
+}
+
+function selectFile(file) {
+    if (!file) {
+        return;
+    }
+
+    selectedResumeFile = file;
+
+    fileName.textContent = file.name;
+    fileSize.textContent = formatFileSize(file.size);
+    fileInfo.classList.add("visible");
+    analyzeButton.disabled = false;
+
+    results.classList.remove("visible");
+    details.style.display = "none";
+    successMessage.textContent = "";
+}
+
+if (dropzone) {
+    dropzone.addEventListener("click", function() {
+        fileInput.click();
+    });
+
+    dropzone.addEventListener("dragover", function(event) {
+        event.preventDefault();
+        dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", function() {
+        dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", function(event) {
+        event.preventDefault();
+        dropzone.classList.remove("dragover");
+
+        const files = event.dataTransfer.files;
+
+        if (files && files.length) {
+            selectFile(files[0]);
+        }
+    });
+}
+
+if (fileInput) {
+    fileInput.addEventListener("change", function() {
+        if (fileInput.files && fileInput.files.length) {
+            selectFile(fileInput.files[0]);
+        }
+    });
+}
+
+function cleanText(text) {
+    return String(text || "")
+        .replace(/\r/g, " ")
+        .replace(/\t/g, " ")
+        .replace(/[ ]{2,}/g, " ")
+        .replace(/\n[ ]+/g, "\n")
+        .trim();
+}
+
+function detectEmail(text) {
+    const match = text.match(
+        /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i
+    );
+
+    return match ? match[0] : "";
+}
+
+function detectPhone(text) {
+    const matches = text.match(
+        /(?:\+?\d[\d\s().-]{8,}\d)/g
+    );
+
+    if (!matches) {
+        return "";
+    }
+
+    for (let i = 0; i < matches.length; i++) {
+        const value = matches[i].trim();
+        const digits = value.replace(/\D/g, "");
+
+        if (digits.length >= 10 && digits.length <= 15) {
+            return value;
+        }
+    }
+
+    return "";
+}
+
+function detectName(text, email) {
+    const lines = text
+        .split("\n")
+        .map(function(line) {
+            return line.trim();
+        })
+        .filter(Boolean);
+
+    const excluded = [
+        "resume",
+        "curriculum vitae",
+        "cv",
+        "profile",
+        "objective",
+        "summary",
+        "contact",
+        "education",
+        "skills",
+        "experience",
+        "projects",
+        "qualifications"
+    ];
+
+    for (let i = 0; i < Math.min(lines.length, 12); i++) {
+        const line = lines[i];
+
+        if (email && line.indexOf(email) >= 0) {
+            continue;
+        }
+
+        if (/\d/.test(line)) {
+            continue;
+        }
+
+        if (line.length < 3 || line.length > 60) {
+            continue;
+        }
+
+        const lower = line.toLowerCase();
+
+        let ignored = false;
+
+        for (let j = 0; j < excluded.length; j++) {
+            if (lower === excluded[j]) {
+                ignored = true;
+                break;
+            }
+        }
+
+        if (ignored) {
+            continue;
+        }
+
+        if (/^[A-Za-z][A-Za-z .'-]+$/.test(line)) {
+            return line;
+        }
+    }
+
+    return "";
+}
+
+function detectSkills(text) {
+    const skillList = [
+        "Java",
+        "Python",
+        "JavaScript",
+        "TypeScript",
+        "C++",
+        "C#",
+        "C",
+        "SQL",
+        "HTML",
+        "CSS",
+        "React",
+        "Angular",
+        "Vue",
+        "Node.js",
+        "Spring Boot",
+        "Django",
+        "Flask",
+        "PHP",
+        "Laravel",
+        "Android",
+        "Flutter",
+        "React Native",
+        "AWS",
+        "Azure",
+        "Google Cloud",
+        "Docker",
+        "Kubernetes",
+        "DevOps",
+        "Git",
+        "GitHub",
+        "Linux",
+        "Machine Learning",
+        "Artificial Intelligence",
+        "Deep Learning",
+        "Data Science",
+        "Data Analysis",
+        "Power BI",
+        "Tableau",
+        "Excel",
+        "Cybersecurity",
+        "Figma",
+        "UI/UX",
+        "Communication",
+        "Project Management",
+        "Sales",
+        "Marketing",
+        "Accounting",
+        "Recruitment"
+    ];
+
+    const lowerText = text.toLowerCase();
+    const found = [];
+
+    for (let i = 0; i < skillList.length; i++) {
+        const skill = skillList[i];
+
+        if (
+            lowerText.indexOf(skill.toLowerCase()) >= 0 &&
+            found.indexOf(skill) === -1
+        ) {
+            found.push(skill);
+        }
+    }
+
+    return found;
+}
+
+function detectQualification(text) {
+    const qualifications = [
+        "B.Tech",
+        "B.E.",
+        "Bachelor of Technology",
+        "Bachelor of Engineering",
+        "BCA",
+        "Bachelor of Computer Applications",
+        "B.Sc",
+        "Bachelor of Science",
+        "M.Tech",
+        "M.E.",
+        "Master of Technology",
+        "Master of Engineering",
+        "MCA",
+        "Master of Computer Applications",
+        "M.Sc",
+        "Master of Science",
+        "MBA",
+        "Master of Business Administration",
+        "B.Com",
+        "Bachelor of Commerce",
+        "Diploma"
+    ];
+
+    const lowerText = text.toLowerCase();
+
+    for (let i = 0; i < qualifications.length; i++) {
+        if (lowerText.indexOf(qualifications[i].toLowerCase()) >= 0) {
+            return qualifications[i];
+        }
+    }
+
+    return "";
+}
+
+function detectExperience(text) {
+    const patterns = [
+        /(\d+(?:\.\d+)?)\s*(?:-|to)\s*(\d+(?:\.\d+)?)\s*(?:years?|yrs?)/i,
+        /(\d+(?:\.\d+)?)\s*\+?\s*(?:years?|yrs?)\s*(?:of)?\s*experience/i,
+        /experience\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*(?:years?|yrs?)/i
+    ];
+
+    for (let i = 0; i < patterns.length; i++) {
+        const match = text.match(patterns[i]);
+
+        if (match) {
+            if (match[2]) {
+                return match[1] + "-" + match[2] + " years";
+            }
+
+            return match[1] + " years";
+        }
+    }
+
+    return "";
+}
+
+function detectLocation(text) {
+    const locations = [
+        "Kochi",
+        "Ernakulam",
+        "Thiruvananthapuram",
+        "Trivandrum",
+        "Kollam",
+        "Alappuzha",
+        "Kottayam",
+        "Pathanamthitta",
+        "Idukki",
+        "Thrissur",
+        "Palakkad",
+        "Malappuram",
+        "Kozhikode",
+        "Calicut",
+        "Wayanad",
+        "Kannur",
+        "Kasaragod",
+        "Bengaluru",
+        "Bangalore",
+        "Chennai",
+        "Hyderabad",
+        "Mumbai",
+        "Delhi",
+        "Pune"
+    ];
+
+    const lowerText = text.toLowerCase();
+
+    for (let i = 0; i < locations.length; i++) {
+        if (lowerText.indexOf(locations[i].toLowerCase()) >= 0) {
+            return locations[i];
+        }
+    }
+
+    return "";
+}
+
+async function extractPdfText(file) {
+    if (!window.pdfjsLib) {
+        throw new Error("PDF parser could not be loaded.");
+    }
+
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+    const buffer = await file.arrayBuffer();
+
+    const pdf = await window.pdfjsLib
+        .getDocument({ data: buffer })
+        .promise;
+
+    let text = "";
+
+    for (
+        let pageNumber = 1;
+        pageNumber <= pdf.numPages;
+        pageNumber++
+    ) {
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+
+        text += content.items
+            .map(function(item) {
+                return item.str;
+            })
+            .join(" ") + "\n";
+    }
+
+    return cleanText(text);
+}
+
+async function extractResumeText(file) {
+    const lowerName = file.name.toLowerCase();
+
+    if (lowerName.endsWith(".pdf")) {
+        return await extractPdfText(file);
+    }
+
+    if (lowerName.endsWith(".txt")) {
+        return cleanText(await file.text());
+    }
+
+    if (
+        lowerName.endsWith(".doc") ||
+        lowerName.endsWith(".docx")
+    ) {
+        throw new Error(
+            "DOC/DOCX text extraction is not available yet. Please use a PDF or TXT resume for analysis."
+        );
+    }
+
+    throw new Error("Unsupported resume format.");
+}
+
+function showDetectedData(text) {
+    const email = detectEmail(text);
+    const phone = detectPhone(text);
+    const name = detectName(text, email);
+    const qualification = detectQualification(text);
+    const experience = detectExperience(text);
+    const location = detectLocation(text);
+    const skills = detectSkills(text);
+
+    document.getElementById("resumeDetectedName").value =
+        name || "Not detected";
+
+    document.getElementById("resumeDetectedEmail").value =
+        email || "Not detected";
+
+    document.getElementById("resumeDetectedPhone").value =
+        phone || "Not detected";
+
+    document.getElementById("resumeDetectedQualification").value =
+        qualification || "Not detected";
+
+    document.getElementById("resumeDetectedExperience").value =
+        experience || "Not detected";
+
+    document.getElementById("resumeDetectedLocation").value =
+        location || "Not detected";
+
+    document.getElementById("resumeDetectedSkills").value =
+        skills.length ? skills.join(", ") : "Not detected";
+
+    details.style.display = "block";
+}
+
+if (analyzeButton) {
+    analyzeButton.addEventListener("click", async function() {
+
+        if (!selectedResumeFile) {
+            return;
+        }
+
+        results.classList.add("visible");
+        details.style.display = "none";
+        successMessage.textContent = "";
+
+        resultMessage.textContent =
+            "Analyzing your resume...";
+
+        analyzeButton.disabled = true;
+
+        try {
+            const text =
+                await extractResumeText(selectedResumeFile);
+
+            if (!text) {
+                resultMessage.textContent =
+                    "The resume contains no selectable text. It may be a scanned image.";
+                return;
+            }
+
+            showDetectedData(text);
+
+            resultMessage.textContent =
+                "Resume text extracted successfully. " +
+                text.length +
+                " characters analyzed. Review the detected information below before applying it to your profile.";
+
+        } catch (error) {
+            console.error("Resume analysis error:", error);
+
+            resultMessage.textContent =
+                error.message ||
+                "Unable to analyze this resume. Please check the file and try again.";
+        } finally {
+            analyzeButton.disabled = false;
+        }
+    });
+}
+
+if (editButton) {
+    editButton.addEventListener("click", function() {
+        const firstField =
+            document.getElementById("resumeDetectedSkills");
+
+        if (firstField) {
+            firstField.focus();
+        }
+
+        successMessage.textContent =
+            "You can edit the detected information before applying it.";
+    });
+}
+
+function profileKey(uid) {
+    return "jobpilot_profile_" + uid;
+}
+
+if (applyButton) {
+    applyButton.addEventListener("click", function() {
+
+        if (!currentUser) {
+            successMessage.textContent =
+                "Please log in before updating your profile.";
+            return;
+        }
+
+        const data = {
+            skills:
+                document.getElementById("resumeDetectedSkills").value
+                    .replace(/\bNot detected\b/gi, "")
+                    .trim(),
+
+            qualification:
+                document.getElementById("resumeDetectedQualification").value
+                    .replace(/\bNot detected\b/gi, "")
+                    .trim(),
+
+            experience:
+                document.getElementById("resumeDetectedExperience").value
+                    .replace(/\bNot detected\b/gi, "")
+                    .trim(),
+
+            preferredLocation:
+                document.getElementById("resumeDetectedLocation").value
+                    .replace(/\bNot detected\b/gi, "")
+                    .trim(),
+
+            expectedSalary: "",
+
+            jobType: "",
+
+            updatedAt: new Date().toISOString()
+        };
+
+        try {
+            const existing =
+                JSON.parse(
+                    localStorage.getItem(
+                        profileKey(currentUser.uid)
+                    ) || "{}"
+                );
+
+            if (!data.skills) {
+                data.skills = existing.skills || "";
+            }
+
+            if (!data.qualification) {
+                data.qualification =
+                    existing.qualification || "";
+            }
+
+            if (!data.experience) {
+                data.experience =
+                    existing.experience || "";
+            }
+
+            if (!data.preferredLocation) {
+                data.preferredLocation =
+                    existing.preferredLocation || "";
+            }
+
+            data.expectedSalary =
+                existing.expectedSalary || "";
+
+            data.jobType =
+                existing.jobType || "";
+
+            localStorage.setItem(
+                profileKey(currentUser.uid),
+                JSON.stringify(data)
+            );
+
+            successMessage.textContent =
+                "✓ Profile updated successfully. You can review it from My Profile.";
+
+        } catch (error) {
+            console.error("Profile update error:", error);
+
+            successMessage.textContent =
+                "Unable to update your profile.";
+        }
+    });
+}
+
+if (logoutButton) {
+    logoutButton.addEventListener("click", async function() {
+
+        try {
+            await auth.signOut();
+            window.location.href = "login.html";
+        } catch (error) {
+            console.error("Logout error:", error);
+        }
+    });
+}
+
+onAuthStateChanged(auth, function(user) {
+
+    if (!user) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    currentUser = user;
+
+    const displayName =
+        user.displayName || "User";
+
+    const email =
+        user.email || "";
+
+    const initials =
+        getInitials(displayName);
+
+    const sidebarAvatar =
+        document.getElementById(
+            "resumeSidebarAvatar"
+        );
+
+    const sidebarName =
+        document.getElementById(
+            "resumeSidebarUserName"
+        );
+
+    const sidebarEmail =
+        document.getElementById(
+            "resumeSidebarUserEmail"
+        );
+
+    if (sidebarAvatar) {
+        sidebarAvatar.textContent =
+            initials;
+    }
+
+    if (sidebarName) {
+        sidebarName.textContent =
+            displayName;
+    }
+
+    if (sidebarEmail) {
+        sidebarEmail.textContent =
+            email;
+    }
+});
+</script>
+
+</body>
+</html>
