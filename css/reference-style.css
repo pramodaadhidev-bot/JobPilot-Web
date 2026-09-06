@@ -817,3 +817,26 @@ body.register-page {
     }
 }
 
+
+/* ---------- COMPLETION CARD TEXT CONTRAST FIX ---------- */
+.dashboard .completion-card {
+    color: #2d2831 !important;
+}
+
+.dashboard .completion-card h2 {
+    color: #2d2831 !important;
+}
+
+.dashboard .completion-card p {
+    color: #655d67 !important;
+}
+
+.dashboard .completion-card .progress-header {
+    color: #514954 !important;
+}
+
+.dashboard .completion-card .progress-header strong,
+.dashboard .completion-card .progress-header span {
+    color: #514954 !important;
+}
+
