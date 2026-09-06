@@ -556,258 +556,264 @@ body.register-page {
 }
 
 /* =========================================================
-   MOBILE DASHBOARD VISIBILITY & SIZE FIX
+   JOBPILOT MOBILE DASHBOARD REFERENCE LAYOUT
    ========================================================= */
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
 
+    body {
+        background: #f3eee6 !important;
+    }
+
+    /* Full-width mobile dashboard */
     .dashboard {
+        display: block !important;
         width: 100% !important;
-        max-width: 100% !important;
+        min-height: 100vh !important;
         margin: 0 !important;
-        padding: 12px !important;
+        padding: 0 !important;
+        background: #fff !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        overflow: visible !important;
     }
 
-    .dashboard-main,
-    .main-content {
-        width: 100% !important;
-        max-width: 100% !important;
+    /* Keep sidebar hidden until the menu is opened */
+    .sidebar {
+        display: none !important;
     }
 
-    .dashboard-card,
-    .card {
-        width: 100%;
-        min-height: 120px;
-        padding: 20px !important;
-        border-radius: 20px;
-    }
-
-    .dashboard h1,
-    .dashboard h2,
-    .dashboard h3 {
-        font-size: 1.15rem !important;
-        font-weight: 700 !important;
-        line-height: 1.3 !important;
-    }
-
-    .dashboard p,
-    .dashboard .card-text,
-    .dashboard .description,
-    .dashboard small {
-        font-size: 0.95rem !important;
-        line-height: 1.5 !important;
-        font-weight: 500 !important;
-    }
-
-    .dashboard .label,
-    .dashboard .stat-label {
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-    }
-
-    .dashboard span {
-        font-size: inherit;
-    }
-
-    .dashboard > *,
-    .dashboard-main > * {
-        margin-bottom: 14px;
-    }
-}
-
-
-/* =========================================================
-   JOBPILOT MOBILE DASHBOARD - FINAL SIZE & READABILITY FIX
-   ========================================================= */
-
-@media (max-width: 760px) {
-
-    /* Give the dashboard more usable screen width */
-    .dashboard {
-        width: 100% !important;
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 8px !important;
-        gap: 12px !important;
-    }
-
+    /* Main content fills the phone */
     .dashboard-main {
+        display: block !important;
         width: 100% !important;
         min-width: 0 !important;
-        padding: 14px !important;
+        padding: 24px 16px 40px !important;
+        background: #fff !important;
     }
 
     /* Header */
     .dashboard-header {
-        padding: 8px 4px 18px !important;
+        display: block !important;
+        margin-bottom: 22px !important;
     }
 
     .welcome-label {
-        font-size: 0.78rem !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.08em !important;
+        color: #665b69 !important;
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        letter-spacing: 1.5px !important;
     }
 
     .dashboard-header h1 {
-        font-size: 1.7rem !important;
+        margin-top: 4px !important;
+        color: #27232b !important;
+        font-size: 28px !important;
         line-height: 1.2 !important;
-        font-weight: 800 !important;
+        font-weight: 850 !important;
+        letter-spacing: -0.8px !important;
     }
 
     .header-subtitle {
-        font-size: 0.95rem !important;
+        margin-top: 8px !important;
+        color: #625b64 !important;
+        font-size: 14px !important;
         line-height: 1.5 !important;
         font-weight: 500 !important;
     }
 
-    /* Complete profile card */
-    .completion-card {
+    .header-search {
         width: 100% !important;
+        min-width: 0 !important;
+        margin-top: 16px !important;
+        padding: 14px 16px !important;
+        border-radius: 16px !important;
+        font-size: 13px !important;
+    }
+
+    /* Complete your profile */
+    .completion-card {
+        display: block !important;
+        width: 100% !important;
+        margin-bottom: 18px !important;
         padding: 20px !important;
         border-radius: 22px !important;
-        min-height: 150px !important;
+        background:
+            radial-gradient(circle at 90% 15%, rgba(244,201,79,.22), transparent 30%),
+            linear-gradient(135deg, #fffaf0, #f8f4ff) !important;
+        box-shadow: 0 10px 28px rgba(67,55,72,.08) !important;
     }
 
     .completion-info {
-        gap: 12px !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 13px !important;
     }
 
     .completion-icon {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        font-size: 1.2rem !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        border-radius: 13px !important;
+        font-size: 20px !important;
     }
 
-    .completion-card h3,
     .completion-card h2 {
-        font-size: 1.15rem !important;
+        color: #302a33 !important;
+        font-size: 17px !important;
         line-height: 1.3 !important;
         font-weight: 800 !important;
     }
 
     .completion-card p {
-        font-size: 0.9rem !important;
-        line-height: 1.45 !important;
+        margin-top: 6px !important;
+        color: #655d67 !important;
+        font-size: 13px !important;
+        line-height: 1.5 !important;
         font-weight: 500 !important;
     }
 
+    .completion-progress {
+        margin-top: 18px !important;
+    }
+
     .progress-header {
-        font-size: 0.9rem !important;
+        color: #514954 !important;
+        font-size: 12px !important;
         font-weight: 700 !important;
     }
 
     .complete-btn {
-        font-size: 0.9rem !important;
-        font-weight: 700 !important;
-        padding: 10px 16px !important;
+        display: inline-flex !important;
+        margin-top: 16px !important;
+        padding: 11px 17px !important;
+        border-radius: 12px !important;
+        font-size: 13px !important;
+        font-weight: 800 !important;
     }
 
     /* Statistics */
     .stats-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px !important;
         width: 100% !important;
-        gap: 10px !important;
+        margin-bottom: 24px !important;
     }
 
     .stat-card {
-        min-height: 105px !important;
-        padding: 16px !important;
-        border-radius: 18px !important;
-    }
-
-    .stat-card h2 {
-        font-size: 1.5rem !important;
-        font-weight: 800 !important;
-    }
-
-    .stat-card p,
-    .stat-card span {
-        font-size: 0.82rem !important;
-        font-weight: 600 !important;
+        min-width: 0 !important;
+        min-height: 125px !important;
+        padding: 17px !important;
+        border: 1px solid #eee9ed !important;
+        border-radius: 20px !important;
+        background: #fff !important;
+        box-shadow: 0 8px 22px rgba(67,55,72,.06) !important;
     }
 
     .stat-icon {
-        font-size: 1.1rem !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 12px !important;
+        font-size: 18px !important;
     }
 
-    /* Section headings */
+    .stat-card h2 {
+        margin-top: 10px !important;
+        color: #2d2831 !important;
+        font-size: 23px !important;
+        font-weight: 850 !important;
+    }
+
+    .stat-card p {
+        margin-top: 3px !important;
+        color: #625b64 !important;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Sections */
     .content-section {
         width: 100% !important;
-        margin-top: 18px !important;
+        margin-bottom: 25px !important;
     }
 
     .section-heading {
         margin-bottom: 12px !important;
     }
 
-    .section-heading h2 {
-        font-size: 1.25rem !important;
-        font-weight: 800 !important;
-    }
-
     .section-eyebrow {
-        font-size: 0.72rem !important;
+        color: #776d79 !important;
+        font-size: 10px !important;
         font-weight: 800 !important;
-        letter-spacing: 0.08em !important;
+        letter-spacing: 1.5px !important;
     }
 
-    /* Recommended jobs / activity */
-    .job-list,
+    .section-heading h2 {
+        color: #2b2730 !important;
+        font-size: 21px !important;
+        line-height: 1.25 !important;
+        font-weight: 850 !important;
+    }
+
     .activity-card {
-        width: 100% !important;
+        border-radius: 20px !important;
     }
 
-    .empty-state {
-        padding: 24px 16px !important;
-    }
-
-    .empty-state h3 {
-        font-size: 1rem !important;
-        font-weight: 700 !important;
-    }
-
-    .empty-state p {
-        font-size: 0.88rem !important;
-        line-height: 1.5 !important;
-        font-weight: 500 !important;
-    }
-
-    /* Right profile panel */
+    /* Mobile profile panel */
     .dashboard-right {
+        display: block !important;
         width: 100% !important;
-        max-width: none !important;
-        padding: 16px !important;
+        min-width: 0 !important;
+        padding: 24px 16px 40px !important;
+        background: #f4c94f !important;
+    }
+
+    .right-panel-header {
+        padding-left: 0 !important;
     }
 
     .profile-summary-card {
-        padding: 20px !important;
         border-radius: 22px !important;
     }
+}
 
-    .profile-summary-card h2 {
-        font-size: 1.25rem !important;
-        font-weight: 800 !important;
+/* Small phones */
+@media (max-width: 420px) {
+
+    .dashboard-main {
+        padding-left: 13px !important;
+        padding-right: 13px !important;
     }
 
-    .profile-summary-card p {
-        font-size: 0.9rem !important;
-        font-weight: 500 !important;
+    .dashboard-header h1 {
+        font-size: 25px !important;
     }
 
-    .profile-detail {
-        font-size: 0.88rem !important;
-        font-weight: 600 !important;
+    .completion-card {
+        padding: 17px !important;
     }
 
-    .right-section-title {
-        font-size: 0.9rem !important;
-        font-weight: 800 !important;
+    .completion-card h2 {
+        font-size: 16px !important;
     }
 
-    /* Prevent tiny text anywhere inside the dashboard */
-    .dashboard-main *,
-    .dashboard-right * {
-        -webkit-text-size-adjust: 100%;
+    .completion-card p {
+        font-size: 12px !important;
+    }
+
+    .stat-card {
+        min-height: 115px !important;
+        padding: 14px !important;
+    }
+
+    .stat-card h2 {
+        font-size: 21px !important;
+    }
+
+    .stat-card p {
+        font-size: 11px !important;
     }
 }
 
