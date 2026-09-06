@@ -615,3 +615,199 @@ body.register-page {
     }
 }
 
+
+/* =========================================================
+   JOBPILOT MOBILE DASHBOARD - FINAL SIZE & READABILITY FIX
+   ========================================================= */
+
+@media (max-width: 760px) {
+
+    /* Give the dashboard more usable screen width */
+    .dashboard {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 8px !important;
+        gap: 12px !important;
+    }
+
+    .dashboard-main {
+        width: 100% !important;
+        min-width: 0 !important;
+        padding: 14px !important;
+    }
+
+    /* Header */
+    .dashboard-header {
+        padding: 8px 4px 18px !important;
+    }
+
+    .welcome-label {
+        font-size: 0.78rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    .dashboard-header h1 {
+        font-size: 1.7rem !important;
+        line-height: 1.2 !important;
+        font-weight: 800 !important;
+    }
+
+    .header-subtitle {
+        font-size: 0.95rem !important;
+        line-height: 1.5 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Complete profile card */
+    .completion-card {
+        width: 100% !important;
+        padding: 20px !important;
+        border-radius: 22px !important;
+        min-height: 150px !important;
+    }
+
+    .completion-info {
+        gap: 12px !important;
+    }
+
+    .completion-icon {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        font-size: 1.2rem !important;
+    }
+
+    .completion-card h3,
+    .completion-card h2 {
+        font-size: 1.15rem !important;
+        line-height: 1.3 !important;
+        font-weight: 800 !important;
+    }
+
+    .completion-card p {
+        font-size: 0.9rem !important;
+        line-height: 1.45 !important;
+        font-weight: 500 !important;
+    }
+
+    .progress-header {
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+    }
+
+    .complete-btn {
+        font-size: 0.9rem !important;
+        font-weight: 700 !important;
+        padding: 10px 16px !important;
+    }
+
+    /* Statistics */
+    .stats-grid {
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .stat-card {
+        min-height: 105px !important;
+        padding: 16px !important;
+        border-radius: 18px !important;
+    }
+
+    .stat-card h2 {
+        font-size: 1.5rem !important;
+        font-weight: 800 !important;
+    }
+
+    .stat-card p,
+    .stat-card span {
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+    }
+
+    .stat-icon {
+        font-size: 1.1rem !important;
+    }
+
+    /* Section headings */
+    .content-section {
+        width: 100% !important;
+        margin-top: 18px !important;
+    }
+
+    .section-heading {
+        margin-bottom: 12px !important;
+    }
+
+    .section-heading h2 {
+        font-size: 1.25rem !important;
+        font-weight: 800 !important;
+    }
+
+    .section-eyebrow {
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        letter-spacing: 0.08em !important;
+    }
+
+    /* Recommended jobs / activity */
+    .job-list,
+    .activity-card {
+        width: 100% !important;
+    }
+
+    .empty-state {
+        padding: 24px 16px !important;
+    }
+
+    .empty-state h3 {
+        font-size: 1rem !important;
+        font-weight: 700 !important;
+    }
+
+    .empty-state p {
+        font-size: 0.88rem !important;
+        line-height: 1.5 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Right profile panel */
+    .dashboard-right {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 16px !important;
+    }
+
+    .profile-summary-card {
+        padding: 20px !important;
+        border-radius: 22px !important;
+    }
+
+    .profile-summary-card h2 {
+        font-size: 1.25rem !important;
+        font-weight: 800 !important;
+    }
+
+    .profile-summary-card p {
+        font-size: 0.9rem !important;
+        font-weight: 500 !important;
+    }
+
+    .profile-detail {
+        font-size: 0.88rem !important;
+        font-weight: 600 !important;
+    }
+
+    .right-section-title {
+        font-size: 0.9rem !important;
+        font-weight: 800 !important;
+    }
+
+    /* Prevent tiny text anywhere inside the dashboard */
+    .dashboard-main *,
+    .dashboard-right * {
+        -webkit-text-size-adjust: 100%;
+    }
+}
+
