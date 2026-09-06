@@ -12,72 +12,52 @@
 <div class="jobs-page">
 
     <!-- SIDEBAR -->
-    <aside class="jobs-sidebar">
-
+    <aside class="sidebar">
         <div class="sidebar-brand">
-            <div class="brand-mark">J</div>
-            <span>JobPilot</span>
+            <div class="brand-icon">✦</div>
+            <div class="brand-text">
+                <div class="brand-name">JobPilot</div>
+                <div class="brand-tagline">Career, simplified.</div>
+            </div>
         </div>
 
-        <div class="jobs-nav-label">WORKSPACE</div>
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="jobsSidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="jobsSidebarUserName">Loading...</div>
+                <div class="profile-email" id="jobsSidebarUserEmail">Loading...</div>
+            </div>
+        </div>
 
-        <nav class="jobs-nav">
-            <a href="dashboard.html">
-                <span class="nav-icon">⌂</span>
-                <span>Dashboard</span>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span>⌂</span><span>Dashboard</span>
             </a>
-
-            <a href="jobs.html" class="active">
-                <span class="nav-icon">⌕</span>
-                <span>Find Jobs</span>
+            <a href="jobs.html" class="nav-item active">
+                <span>⌕</span><span>Find Jobs</span>
             </a>
-
-            <a href="recommendations.html">
-                <span class="nav-icon">✦</span>
-                <span>Recommendations</span>
+            <a href="recommendations.html" class="nav-item">
+                <span>✦</span><span>Recommendations</span>
             </a>
-
-            <a href="saved.html">
-                <span class="nav-icon">♡</span>
-                <span>Saved Jobs</span>
+            <a href="saved.html" class="nav-item">
+                <span>♡</span><span>Saved Jobs</span>
             </a>
-
-            <div class="jobs-nav-label jobs-nav-label-space">TOOLS</div>
-
-            <a href="resume.html">
-                <span class="nav-icon">▤</span>
-                <span>Resume Analysis</span>
+            <a href="resume.html" class="nav-item">
+                <span>▣</span><span>Resume Analysis</span>
             </a>
-
-            <a href="profile.html">
-                <span class="nav-icon">◎</span>
-                <span>Profile</span>
+            <a href="profile.html" class="nav-item">
+                <span>◎</span><span>My Profile</span>
             </a>
-
-            <a href="settings.html">
-                <span class="nav-icon">⚙</span>
-                <span>Settings</span>
+            <a href="settings.html" class="nav-item">
+                <span>⚙</span><span>Settings</span>
             </a>
         </nav>
 
         <div class="sidebar-bottom">
-
-            <div class="sidebar-user">
-                <div class="sidebar-avatar" id="jobsSidebarAvatar">U</div>
-
-                <div class="sidebar-user-info">
-                    <strong id="jobsSidebarUserName">User</strong>
-                    <small id="jobsSidebarUserEmail">Signed in</small>
-                </div>
-            </div>
-
-            <button id="jobsLogoutBtn" class="sidebar-logout">
-                <span>↪</span>
-                Logout
+            <button id="jobsLogoutBtn" class="logout-btn">
+                <span>↪</span><span>Logout</span>
             </button>
-
         </div>
-
     </aside>
 
 
