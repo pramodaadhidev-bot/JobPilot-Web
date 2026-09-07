@@ -7,7 +7,7 @@
     },
     {
       "src": "/",
-      "dest": "/login.html"
+      "dest": "/index.html"
     },
     {
       "handle": "filesystem"
