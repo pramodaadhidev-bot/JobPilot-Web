@@ -644,6 +644,8 @@ async function loadRecommendations() {
 
         recommendationCount.textContent = String(results.length);
 
+        localStorage.setItem("jobpilot_last_recommendation_count", String(results.length));
+
         if (!results.length) {
             showEmpty(
                 "We couldn't find matching jobs right now. Try updating your profile or checking Find Jobs with broader preferences.",

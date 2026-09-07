@@ -1254,6 +1254,8 @@
 
             renderJobs(jobs);
 
+            localStorage.setItem("jobpilot_last_jobs_found", String(Array.isArray(jobs) ? jobs.length : 0));
+
             showMessage(
                 jobs.length +
                 " matching jobs found.",

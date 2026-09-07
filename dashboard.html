@@ -773,6 +773,37 @@ onAuthStateChanged(auth, function(user) {
     if (profileAvatar) profileAvatar.textContent = initials || "U";
 });
 </script>
+<script>
+(function () {
+    function readNumber(key) {
+        var value = localStorage.getItem(key);
+        var number = Number(value);
+        return Number.isFinite(number) && number >= 0 ? number : 0;
+    }
+
+    function updateDashboardStats() {
+        var jobsFound = document.getElementById("jobsFound");
+        var recommendedCount = document.getElementById("recommendedCount");
+        var savedCount = document.getElementById("savedCount");
+        var applicationCount = document.getElementById("applicationCount");
+        var savedJobs = [];
+
+        try {
+            savedJobs = JSON.parse(localStorage.getItem("jobpilot_saved_jobs") || "[]");
+        } catch (error) {
+            savedJobs = [];
+        }
+
+        if (jobsFound) jobsFound.textContent = String(readNumber("jobpilot_last_jobs_found"));
+        if (recommendedCount) recommendedCount.textContent = String(readNumber("jobpilot_last_recommendation_count"));
+        if (savedCount) savedCount.textContent = String(Array.isArray(savedJobs) ? savedJobs.length : 0);
+        if (applicationCount) applicationCount.textContent = String(readNumber("jobpilot_application_count"));
+    }
+
+    updateDashboardStats();
+    window.addEventListener("storage", updateDashboardStats);
+})();
+</script>
 <script src="js/jobs.js"></script>
 
 </body>
