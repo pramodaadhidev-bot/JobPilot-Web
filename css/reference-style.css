@@ -840,3 +840,110 @@ body.register-page {
     color: #514954 !important;
 }
 
+
+/* =========================================================
+   FINAL DASHBOARD SIDEBAR + DESKTOP LAYOUT OVERRIDES
+   Loaded last so these rules win over earlier dashboard CSS.
+   ========================================================= */
+
+@media (min-width: 901px) {
+    .dashboard > .sidebar {
+        width: auto !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: calc(100vh - 32px) !important;
+        position: relative !important;
+        padding: 26px 16px !important;
+        background: linear-gradient(180deg, #171535 0%, #211b4b 100%) !important;
+        border: 0 !important;
+    }
+
+    .dashboard > .sidebar .sidebar-brand {
+        padding: 0 12px 28px !important;
+        font-size: 21px !important;
+    }
+
+    .dashboard > .sidebar .brand-icon {
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 12px !important;
+        background: linear-gradient(135deg, #7667ff, #9a68ff) !important;
+        color: #fff !important;
+        box-shadow: 0 8px 22px rgba(118,103,255,.28) !important;
+    }
+
+    .dashboard > .sidebar .sidebar-profile {
+        margin: 0 0 20px !important;
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
+        background: rgba(255,255,255,.07) !important;
+    }
+
+    .dashboard > .sidebar .profile-avatar {
+        background: linear-gradient(135deg, #8b7cff, #bd78ff) !important;
+        color: #fff !important;
+    }
+
+    .dashboard > .sidebar .nav-item {
+        min-height: 46px !important;
+        margin: 0 !important;
+        border-radius: 11px !important;
+        color: rgba(255,255,255,.67) !important;
+    }
+
+    .dashboard > .sidebar .nav-item:hover {
+        background: rgba(255,255,255,.08) !important;
+        color: #fff !important;
+    }
+
+    .dashboard > .sidebar .nav-item.active {
+        background: linear-gradient(90deg, rgba(119,103,255,.95), rgba(119,103,255,.55)) !important;
+        color: #fff !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.12) !important;
+    }
+}
+
+/* Medium laptop / desktop: let the dashboard main area fill the space
+   when the yellow right profile panel is hidden. */
+@media (min-width: 901px) and (max-width: 1200px) {
+    .dashboard {
+        grid-template-columns: 225px minmax(0, 1fr) !important;
+    }
+
+    .dashboard-right {
+        display: none !important;
+    }
+}
+
+/* Dashboard mobile: keep sidebar available to the three-dot menu.
+   It is hidden until the existing JS adds .mobile-menu-open. */
+@media (max-width: 800px) {
+    .dashboard > .sidebar {
+        display: none !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 250px !important;
+        min-width: 250px !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        z-index: 10000 !important;
+        transform: translateX(-105%) !important;
+        transition: transform .28s ease !important;
+        overflow-y: auto !important;
+        box-shadow: 12px 0 35px rgba(18,15,55,.25) !important;
+    }
+
+    body.mobile-menu-open .dashboard > .sidebar {
+        display: flex !important;
+        transform: translateX(0) !important;
+    }
+}
+
+/* Profile has only sidebar + main content, so remove the unused
+   third grid column on desktop. */
+@media (min-width: 801px) {
+    .profile-page .dashboard {
+        grid-template-columns: 240px minmax(0, 1fr) !important;
+    }
+}
