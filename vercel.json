@@ -1,16 +1,18 @@
 {
-  "version": 2,
-  "routes": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "jobpilot": {
+      "root": ".",
+      "entrypoint": "Dockerfile.vercel",
+      "runtime": "container"
+    }
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "handle": "filesystem"
+      "source": "/(.*)",
+      "destination": {
+        "service": "jobpilot"
+      }
     }
   ]
 }
