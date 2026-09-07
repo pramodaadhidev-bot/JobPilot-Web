@@ -3,5 +3,4 @@
 .env.*
 !.env.example
 *.before-*
-WebServer.java
 WebServer.java.working
