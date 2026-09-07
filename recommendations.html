@@ -721,5 +721,18 @@ if (logoutButton) {
 </script>
 
 
+<style id="mobile-layout-fix">
+@media (max-width: 800px) {
+html, body { width: 100% !important; min-width: 0 !important; max-width: 100% !important; overflow-x: hidden !important; }
+.dashboard { display: block !important; width: 100% !important; min-width: 0 !important; min-height: 100vh !important; }
+.dashboard > .sidebar { position: fixed !important; top: 0 !important; left: 0 !important; width: 250px !important; min-width: 250px !important; height: 100vh !important; min-height: 100vh !important; z-index: 10000 !important; transform: translateX(-105%) !important; transition: transform .28s ease !important; overflow-y: auto !important; }
+body.mobile-menu-open .dashboard > .sidebar { display: flex !important; transform: translateX(0) !important; }
+.dashboard-main { display: block !important; width: 100% !important; max-width: none !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; box-sizing: border-box !important; }
+.recommendations-main { width: 100% !important; max-width: none !important; min-width: 0 !important; margin: 0 !important; box-sizing: border-box !important; padding: 76px 14px 35px !important; }
+.profile-match-panel { grid-template-columns: 1fr !important; width: 100% !important; }
+.recommendation-count-box { width: 100% !important; max-width: none !important; box-sizing: border-box !important; }
+}
+@media (max-width: 480px) { .recommendations-main { padding: 76px 12px 30px !important; } }
+</style>
 </body>
 </html>
