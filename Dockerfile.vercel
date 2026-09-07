@@ -6,4 +6,4 @@ COPY . .
 
 RUN javac WebServer.java AdzunaClient.java JobService.java
 
-CMD ["java", "WebServer"]
+CMD ["/opt/java/openjdk/bin/java", "WebServer"]
