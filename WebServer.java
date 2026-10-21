@@ -107,6 +107,7 @@ public class WebServer {
         path = URLDecoder.decode(path, "UTF-8");
 
         File file = new File("." + path).getCanonicalFile();
+        System.out.println("DIAGNOSTIC resolved file: " + file.getAbsolutePath() + " exists=" + file.isFile());
         File root = new File(".").getCanonicalFile();
 
         // Prevent requests from escaping the project directory.
