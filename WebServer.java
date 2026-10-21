@@ -61,6 +61,9 @@ public class WebServer {
         String path = request.path;
 
         System.out.println("Requested: " + method + " " + path);
+        System.out.println("DIAGNOSTIC working directory: " + new File(".").getAbsolutePath());
+        System.out.println("DIAGNOSTIC index.html exists: " + new File("index.html").isFile());
+        System.out.println("DIAGNOSTIC requested path: " + path);
 
         // =========================
         // MYSQL PROFILE AND SAVED-JOBS API
