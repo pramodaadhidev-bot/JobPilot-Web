@@ -437,11 +437,16 @@ async function savedJobsApi(method, job) {
     return result;
 }
 
+function savedJobsStorageKey() {
+    const user = auth.currentUser;
+    return user ? "jobpilot_saved_jobs_" + user.uid : null;
+}
+
 function getSavedJobs() {
     try {
-        return JSON.parse(
-            localStorage.getItem("jobpilot_saved_jobs") || "[]"
-        );
+        const key = savedJobsStorageKey();
+        if (!key) return [];
+        return JSON.parse(localStorage.getItem(key) || "[]");
     } catch (error) {
         return [];
     }
@@ -495,10 +500,8 @@ function removeSavedJob(job) {
         return getSaveId(savedJob) !== id;
     });
 
-    localStorage.setItem(
-        "jobpilot_saved_jobs",
-        JSON.stringify(savedJobs)
-    );
+    const storageKey = savedJobsStorageKey();
+    if (storageKey) localStorage.setItem(storageKey, JSON.stringify(savedJobs));
 
     savedJobsApi("DELETE", job).then(function () {
         loadSavedJobs();
@@ -512,10 +515,8 @@ function removeSavedJob(job) {
             currentJobs.push(job);
         }
 
-        localStorage.setItem(
-            "jobpilot_saved_jobs",
-            JSON.stringify(currentJobs)
-        );
+        const recoveryStorageKey = savedJobsStorageKey();
+        if (recoveryStorageKey) localStorage.setItem(recoveryStorageKey, JSON.stringify(currentJobs));
 
         renderSavedJobs();
         showStatus(
@@ -555,52 +556,25 @@ function renderSavedJobs() {
 
     showStatus(
         "The saved job display is not ready. Please refresh the page."
-    );
+        );
 }
 
 
 async function loadSavedJobs() {
     hideStatus();
-
-    const localJobs = getSavedJobs();
-
     try {
         const result = await savedJobsApi("GET");
-
         if (!Array.isArray(result)) {
             throw new Error("Unexpected database response.");
         }
-
-        // POST is an upsert, so existing database jobs are safe to resend.
-        for (const job of localJobs) {
-            try {
-                await savedJobsApi("POST", job);
-            } catch (error) {
-                console.warn("Could not sync a local saved job:", error.message);
-            }
-        }
-
-        // Keep both database jobs and any jobs already stored on this device.
-        const merged = [];
-        const seen = new Set();
-
-        for (const job of result.concat(localJobs)) {
-            const id = getSaveId(job);
-            if (!id || seen.has(id)) continue;
-            seen.add(id);
-            merged.push(job);
-        }
-
-        localStorage.setItem(
-            "jobpilot_saved_jobs",
-            JSON.stringify(merged)
-        );
+        const key = savedJobsStorageKey();
+        if (key) localStorage.setItem(key, JSON.stringify(result));
     } catch (error) {
         console.error("MySQL saved jobs load failed:", error);
-        showStatus("Using this device's saved jobs; database sync failed.");
+        showStatus("Could not load saved jobs from your account. Please refresh and try again.");
     }
 
-    renderSavedJobs();
+        renderSavedJobs();
 }
 
 

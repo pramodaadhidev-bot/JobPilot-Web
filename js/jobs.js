@@ -845,11 +845,17 @@
         return "Recently listed";
     }
 
+    function savedJobsStorageKey() {
+        const bridge = window.JobPilotAuth;
+        const user = bridge && bridge.auth && bridge.auth.currentUser;
+        return user ? "jobpilot_saved_jobs_" + user.uid : null;
+    }
+
     function getSavedJobs() {
         try {
-            return JSON.parse(
-                localStorage.getItem("jobpilot_saved_jobs") || "[]"
-            );
+            const key = savedJobsStorageKey();
+            if (!key) return [];
+            return JSON.parse(localStorage.getItem(key) || "[]");
         } catch (error) {
             return [];
         }
@@ -857,8 +863,9 @@
 
     function saveJobs(jobs) {
         try {
-            localStorage.setItem(
-                "jobpilot_saved_jobs",
+            const key = savedJobsStorageKey();
+            if (!key) return;
+            localStorage.setItem(key,
                 JSON.stringify(jobs)
             );
         } catch (error) {
@@ -1319,7 +1326,8 @@
 
             renderJobs(jobs);
 
-            localStorage.setItem("jobpilot_last_jobs_found", String(Array.isArray(jobs) ? jobs.length : 0));
+            const activeUser = window.JobPilotAuth && window.JobPilotAuth.auth && window.JobPilotAuth.auth.currentUser;
+            if (activeUser) localStorage.setItem("jobpilot_last_jobs_found_" + activeUser.uid, String(Array.isArray(jobs) ? jobs.length : 0));
 
             showMessage(
                 jobs.length +

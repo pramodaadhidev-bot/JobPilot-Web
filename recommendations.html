@@ -644,7 +644,8 @@ async function loadRecommendations() {
 
         recommendationCount.textContent = String(results.length);
 
-        localStorage.setItem("jobpilot_last_recommendation_count", String(results.length));
+        const activeUser = window.JobPilotAuth && window.JobPilotAuth.auth && window.JobPilotAuth.auth.currentUser;
+        if (activeUser) localStorage.setItem("jobpilot_last_recommendation_count_" + activeUser.uid, String(results.length));
 
         if (!results.length) {
             showEmpty(

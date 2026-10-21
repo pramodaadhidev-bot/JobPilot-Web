@@ -754,6 +754,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 const auth = getAuth();
 onAuthStateChanged(auth, function(user) {
     if (!user) return;
+    window.dispatchEvent(new CustomEvent("jobpilot-user-ready", { detail: { uid: user.uid } }));
     const displayName = user.displayName || "User";
     const email = user.email || "";
     const initials = displayName.split(" ").filter(Boolean).map(function(part) { return part.charAt(0); }).join("").substring(0, 2).toUpperCase();
@@ -773,35 +774,37 @@ onAuthStateChanged(auth, function(user) {
     if (profileAvatar) profileAvatar.textContent = initials || "U";
 });
 </script>
-<script>
+<script type="module">
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 (function () {
-    function readNumber(key) {
-        var value = localStorage.getItem(key);
+    function readNumber(key, uid) {
+        var value = localStorage.getItem(key + "_" + uid);
         var number = Number(value);
         return Number.isFinite(number) && number >= 0 ? number : 0;
     }
-
-    function updateDashboardStats() {
+    function updateDashboardStats(uid) {
         var jobsFound = document.getElementById("jobsFound");
         var recommendedCount = document.getElementById("recommendedCount");
         var savedCount = document.getElementById("savedCount");
         var applicationCount = document.getElementById("applicationCount");
         var savedJobs = [];
-
         try {
-            savedJobs = JSON.parse(localStorage.getItem("jobpilot_saved_jobs") || "[]");
-        } catch (error) {
-            savedJobs = [];
-        }
-
-        if (jobsFound) jobsFound.textContent = String(readNumber("jobpilot_last_jobs_found"));
-        if (recommendedCount) recommendedCount.textContent = String(readNumber("jobpilot_last_recommendation_count"));
+            savedJobs = JSON.parse(localStorage.getItem("jobpilot_saved_jobs_" + uid) || "[]");
+        } catch (error) { savedJobs = []; }
+        if (jobsFound) jobsFound.textContent = String(readNumber("jobpilot_last_jobs_found", uid));
+        if (recommendedCount) recommendedCount.textContent = String(readNumber("jobpilot_last_recommendation_count", uid));
         if (savedCount) savedCount.textContent = String(Array.isArray(savedJobs) ? savedJobs.length : 0);
-        if (applicationCount) applicationCount.textContent = String(readNumber("jobpilot_application_count"));
+        if (applicationCount) applicationCount.textContent = String(readNumber("jobpilot_application_count", uid));
     }
-
-    updateDashboardStats();
-    window.addEventListener("storage", updateDashboardStats);
+    var auth = getAuth();
+    onAuthStateChanged(auth, function(user) {
+        if (!user) return;
+        updateDashboardStats(user.uid);
+    });
+    window.addEventListener("storage", function() {
+        var user = auth.currentUser;
+        if (user) updateDashboardStats(user.uid);
+    });
 })();
 </script>
 <script src="js/jobs.js"></script>
