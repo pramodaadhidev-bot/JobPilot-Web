@@ -94,17 +94,16 @@ public class WebServer {
             return;
         }
 
-        if (path.equals("/")) {
-            path = "/index.html";
-        }
-
         int queryIndex = path.indexOf("?");
-
         if (queryIndex >= 0) {
             path = path.substring(0, queryIndex);
         }
 
         path = URLDecoder.decode(path, "UTF-8");
+
+        if (path.isEmpty() || path.equals("/")) {
+            path = "/index.html";
+        }
 
         File file = new File("." + path).getCanonicalFile();
         System.out.println("DIAGNOSTIC resolved file: " + file.getAbsolutePath() + " exists=" + file.isFile());
