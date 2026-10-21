@@ -12,6 +12,9 @@ public class WebServer {
 
     public static void main(String[] args) throws Exception {
 
+        System.out.println("DIAGNOSTIC working directory: " + new File(".").getAbsolutePath());
+        System.out.println("DIAGNOSTIC index.html exists: " + new File("index.html").isFile());
+
         ServerSocket server = new ServerSocket(PORT);
 
         System.out.println("=================================");
