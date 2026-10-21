@@ -608,6 +608,29 @@
         return "jobpilot_profile_" + uid;
     }
 
+    async function databaseProfile(user, method, data) {
+        const token = await user.getIdToken();
+        const options = {
+            method: method,
+            headers: { "Authorization": "Bearer " + token }
+        };
+
+        if (data !== undefined) {
+            options.headers["Content-Type"] = "application/json";
+            options.body = JSON.stringify({ profile: data });
+        }
+
+        const response = await fetch("/api/profile", options);
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error("HTTP " + response.status + ": " +
+                (result.error || "Database request failed"));
+        }
+
+        return result;
+    }
+
     function loadProfile(user) {
         const saved = localStorage.getItem(profileKey(user.uid));
 
@@ -650,6 +673,29 @@
         document.getElementById("profileSidebarAvatar").textContent = initials;
 
         loadProfile(user);
+
+        databaseProfile(user, "GET").then(function (result) {
+            const data = result.profile;
+            if (!data) return;
+
+            if (data.skills === "API test only" &&
+                data.qualification === "Test") return;
+
+            skills.value = data.skills || "";
+            qualification.value = data.qualification || "";
+            experience.value = data.experience || "";
+            location.value = data.preferredLocation || "";
+            salary.value = data.expectedSalary || "";
+            jobType.value = data.jobType || "";
+
+            localStorage.setItem(
+                profileKey(user.uid),
+                JSON.stringify(data)
+            );
+        }).catch(function (error) {
+            console.error("MySQL profile load failed:", error);
+        });
+
     });
 
     form.addEventListener("submit", function (event) {
@@ -676,7 +722,20 @@
             JSON.stringify(data)
         );
 
-        message.textContent = "✓ Profile saved successfully.";
+        message.textContent = "Saving profile to MySQL...";
+        message.className = "profile-message";
+
+        databaseProfile(user, "PUT", data).then(function () {
+            message.textContent = "✓ Profile saved to MySQL successfully.";
+            message.className = "profile-message success";
+        }).catch(function (error) {
+            console.error("MySQL profile save failed:", error);
+            message.textContent =
+                "Saved on this device, but MySQL sync failed: " +
+                error.message;
+            message.className = "profile-message error";
+        });
+
         message.className = "profile-message success";
 
         setTimeout(function () {

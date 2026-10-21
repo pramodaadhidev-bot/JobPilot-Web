@@ -2,8 +2,10 @@
     "use strict";
 
     const form = document.getElementById("jobSearchForm");
-    const resultsContainer = document.getElementById("jobsResults");
-    const resultsTitle = document.getElementById("jobsResultsTitle");
+    const resultsContainer =
+            document.getElementById("jobsResults");
+    const resultsTitle =
+            document.getElementById("jobsResultsTitle");
     const resultsSubtitle = document.getElementById("jobsResultsSubtitle");
     const resultCount = document.getElementById("jobsResultCount");
     const searchMessage = document.getElementById("jobSearchMessage");
@@ -866,6 +868,7 @@
 
     function getJobSaveId(job) {
         return String(
+            job._save_id ||
             job.id ||
             job.redirect_url ||
             job.title ||
@@ -881,15 +884,53 @@
         });
     }
 
+
+    async function syncSavedJobApi(method, job) {
+        const bridge = window.JobPilotAuth;
+        const user = bridge && bridge.auth && bridge.auth.currentUser;
+
+        if (!user) {
+            throw new Error("Please sign in again to sync saved jobs.");
+        }
+
+        const token = await user.getIdToken();
+        let url = "/api/saved-jobs";
+        const options = {
+            method: method,
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        };
+
+        if (method === "POST") {
+            options.headers["Content-Type"] = "application/json";
+            options.body = JSON.stringify(job);
+        } else if (method === "DELETE") {
+            const id = String(
+                job._save_id || job.id || job.redirect_url || job.title || ""
+            );
+            url += "?saveId=" + encodeURIComponent(id);
+        }
+
+        const response = await fetch(url, options);
+        if (!response.ok) {
+            throw new Error("Saved-jobs API returned HTTP " + response.status);
+        }
+    }
+
     function toggleSaveJob(job, button) {
         const id = getJobSaveId(job);
         const savedJobs = getSavedJobs();
-
         const index = savedJobs.findIndex(function (savedJob) {
             return String(savedJob._save_id) === id;
         });
 
+        let method;
+        let syncJob;
+
         if (index >= 0) {
+            syncJob = savedJobs[index];
+            method = "DELETE";
             savedJobs.splice(index, 1);
 
             button.classList.remove("saved");
@@ -897,12 +938,12 @@
                 '<span class="save-icon">♡</span><span>Save</span>';
             button.setAttribute("aria-label", "Save job");
         } else {
-            const savedJob = Object.assign({}, job, {
+            syncJob = Object.assign({}, job, {
                 _save_id: id,
                 _saved_at: new Date().toISOString()
             });
-
-            savedJobs.push(savedJob);
+            method = "POST";
+            savedJobs.push(syncJob);
 
             button.classList.add("saved");
             button.innerHTML =
@@ -911,9 +952,33 @@
         }
 
         saveJobs(savedJobs);
+
+        syncSavedJobApi(method, syncJob).catch(function (error) {
+            console.warn(
+                "Saved locally; database sync failed:",
+                error.message
+            );
+
+            if (method === "DELETE") {
+                const latestJobs = getSavedJobs();
+                if (!latestJobs.some(function (savedJob) {
+                    return String(savedJob._save_id) === id;
+                })) {
+                    latestJobs.push(syncJob);
+                }
+
+                saveJobs(latestJobs);
+                button.classList.add("saved");
+                button.innerHTML =
+                    `<span class="save-icon">♥</span><span>Saved</span>`;
+                button.setAttribute("aria-label", "Remove saved job");
+            }
+        });
     }
 
+
     function renderJobs(jobs) {
+
         const resultsContainer =
             document.getElementById("jobsResults");
 

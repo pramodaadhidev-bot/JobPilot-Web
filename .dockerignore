@@ -1,0 +1,13 @@
+.git
+.env
+.env.*
+*.class
+*.before-*
+*.safety-copy
+Dockerfile.vercel.before-backend-fix
+DBCountCheck.java
+DBOwnershipCheck.java
+TestMySQL.java
+ApiSmokeTest.java
+ApiSmokeTest.class
+api-test.html

@@ -39,35 +39,37 @@ public class WebServer {
 
     private static void handleRequest(Socket client) throws Exception {
 
-        BufferedReader in = new BufferedReader(
-            new InputStreamReader(client.getInputStream())
-        );
-
         OutputStream out = client.getOutputStream();
+        HttpRequest request;
 
-        String request = in.readLine();
+        try {
+            request = HttpRequest.read(client.getInputStream());
+        } catch (IOException e) {
+            sendJson(out, 400,
+                "{\"error\":\"Invalid HTTP request.\"}");
+            return;
+        }
 
         if (request == null) {
             return;
         }
 
-        String[] parts = request.split(" ");
+        String method = request.method;
+        String path = request.path;
 
-        if (parts.length < 2) {
+        System.out.println("Requested: " + method + " " + path);
+
+        // =========================
+        // MYSQL PROFILE AND SAVED-JOBS API
+        // =========================
+
+        if (DatabaseApi.handle(
+                method, path, request.headers, request.body, out)) {
             return;
         }
 
-        String path = parts[1];
-
-        System.out.println("Requested: " + path);
-
-        String line;
-
-        while ((line = in.readLine()) != null && !line.isEmpty()) {
-        }
-
         // =========================
-        // ADZUNA API
+        // EXISTING ADZUNA API
         // =========================
 
         if (path.startsWith("/api/adzuna")) {
@@ -76,8 +78,15 @@ public class WebServer {
         }
 
         // =========================
-        // STATIC FILE SERVER
+        // EXISTING STATIC FILE SERVER
         // =========================
+
+        if (!"GET".equalsIgnoreCase(method)
+                && !"HEAD".equalsIgnoreCase(method)) {
+            sendJson(out, 405,
+                "{\"error\":\"Method not allowed.\"}");
+            return;
+        }
 
         if (path.equals("/")) {
             path = "/index.html";
@@ -91,12 +100,18 @@ public class WebServer {
 
         path = URLDecoder.decode(path, "UTF-8");
 
-        File file = new File("." + path);
+        File file = new File("." + path).getCanonicalFile();
+        File root = new File(".").getCanonicalFile();
+
+        // Prevent requests from escaping the project directory.
+        if (!file.toPath().startsWith(root.toPath())) {
+            sendJson(out, 404,
+                "{\"error\":\"File not found.\"}");
+            return;
+        }
 
         if (file.exists() && file.isFile()) {
-
             byte[] data = Files.readAllBytes(file.toPath());
-
             String contentType = getContentType(path);
 
             String header =
@@ -106,18 +121,17 @@ public class WebServer {
                 "Connection: close\r\n\r\n";
 
             out.write(header.getBytes("UTF-8"));
-            out.write(data);
 
+            if (!"HEAD".equalsIgnoreCase(method)) {
+                out.write(data);
+            }
         } else {
-
-            String response =
-                "<h1>404 - File Not Found</h1>";
-
+            String response = "<h1>404 - File Not Found</h1>";
             byte[] data = response.getBytes("UTF-8");
 
             String header =
                 "HTTP/1.1 404 Not Found\r\n" +
-                "Content-Type: text/html\r\n" +
+                "Content-Type: text/html; charset=UTF-8\r\n" +
                 "Content-Length: " + data.length + "\r\n" +
                 "Connection: close\r\n\r\n";
 
@@ -128,7 +142,6 @@ public class WebServer {
         out.flush();
     }
 
-    // =========================
     // CONTENT TYPE
     // =========================
 

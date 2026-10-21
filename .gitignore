@@ -4,3 +4,8 @@
 !.env.example
 *.before-*
 WebServer.java.working
+
+# Local backend testing files
+api-test.html
+ApiSmokeTest.java
+TestMySQL.java

@@ -4,6 +4,14 @@ WORKDIR /app
 
 COPY . .
 
-RUN javac WebServer.java AdzunaClient.java JobService.java
+RUN javac -cp ".:lib/*" \
+    WebServer.java \
+    AdzunaClient.java \
+    JobService.java \
+    DatabaseApi.java \
+    DatabaseService.java \
+    FirebaseTokenVerifier.java \
+    HttpRequest.java \
+    SetupDatabase.java
 
-CMD ["/opt/java/openjdk/bin/java", "WebServer"]
+CMD ["/opt/java/openjdk/bin/java", "-cp", ".:lib/*", "WebServer"]
