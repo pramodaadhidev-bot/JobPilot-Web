@@ -5045,3 +5045,40 @@ body {
     }
 }
 
+
+/* FINAL LAPTOP FIX: job cards and login fit */
+@media (min-width: 901px) {
+    .jobs-pinterest-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+        width: 100% !important;
+    }
+
+    .jobs-pinterest-card {
+        min-width: 0 !important;
+        padding: 16px !important;
+        box-sizing: border-box !important;
+    }
+
+    .auth-page {
+        min-height: 100vh !important;
+        height: 100vh !important;
+        padding: 12px 20px !important;
+        box-sizing: border-box !important;
+        overflow-y: auto !important;
+    }
+
+    .auth-card {
+        padding: 22px 30px 20px !important;
+        border-radius: 22px !important;
+    }
+
+    .auth-brand {
+        margin-bottom: 16px !important;
+    }
+
+    .auth-container {
+        max-width: 480px !important;
+    }
+}
