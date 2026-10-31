@@ -5082,3 +5082,34 @@ body {
         max-width: 480px !important;
     }
 }
+
+/* FIND JOBS: allow the inner card grid to use the full content width */
+@media (min-width: 901px) {
+    .jobs-page > .jobs-main {
+        flex: 1 1 0 !important;
+        width: calc(100% - 230px) !important;
+        max-width: none !important;
+        min-width: 0 !important;
+    }
+
+    .jobs-results {
+        display: block !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+    }
+
+    .jobs-pinterest-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 24px !important;
+        width: 100% !important;
+        max-width: none !important;
+    }
+
+    .jobs-pinterest-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+}
