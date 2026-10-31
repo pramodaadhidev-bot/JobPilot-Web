@@ -4907,3 +4907,141 @@ body {
         transform: translateX(0) !important;
     }
 }
+
+/* =========================================
+   JOBPILOT LAPTOP LAYOUT ONLY
+   Does not affect mobile, tablet or homepage
+   ========================================= */
+@media (min-width: 901px) {
+
+    /* Find Jobs: two wide result cards per row */
+    .jobs-page {
+        display: flex !important;
+        align-items: flex-start !important;
+        min-width: 0 !important;
+    }
+
+    .jobs-page > .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        flex: 0 0 230px !important;
+        width: 230px !important;
+        overflow-y: auto !important;
+        align-self: flex-start !important;
+    }
+
+    .jobs-page > .jobs-main {
+        flex: 1 1 0 !important;
+        width: calc(100% - 230px) !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding-left: 28px !important;
+        padding-right: 28px !important;
+        box-sizing: border-box !important;
+    }
+
+    .jobs-results {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 20px !important;
+        width: 100% !important;
+    }
+
+    .jobs-results > .jobs-empty-state {
+        grid-column: 1 / -1 !important;
+    }
+
+    .web-job-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Shared dashboard pages: sidebar stays visible */
+    .dashboard:has(> .recommendations-main),
+    .dashboard:has(> .saved-main),
+    .dashboard:has(> .resume-main),
+    .dashboard:has(> .profile-main),
+    .dashboard:has(> .settings-main) {
+        display: grid !important;
+        grid-template-columns: 230px minmax(0, 1fr) !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 100vh !important;
+    }
+
+    .dashboard:has(> .recommendations-main) > .sidebar,
+    .dashboard:has(> .saved-main) > .sidebar,
+    .dashboard:has(> .resume-main) > .sidebar,
+    .dashboard:has(> .profile-main) > .sidebar,
+    .dashboard:has(> .settings-main) > .sidebar {
+        position: sticky !important;
+        top: 0 !important;
+        left: auto !important;
+        display: flex !important;
+        transform: none !important;
+        width: 230px !important;
+        min-width: 230px !important;
+        height: 100vh !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        overflow-y: auto !important;
+        align-self: start !important;
+        box-sizing: border-box !important;
+        z-index: 10 !important;
+    }
+
+    .recommendations-main,
+    .saved-main,
+    .resume-main,
+    .profile-main,
+    .settings-main {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        padding-left: 30px !important;
+        padding-right: 30px !important;
+    }
+
+    /* Use the available width for page content */
+    .resume-layout,
+    .profile-layout,
+    .settings-layout {
+        width: 100% !important;
+        max-width: none !important;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 310px) !important;
+        gap: 20px !important;
+    }
+
+    .resume-card,
+    .profile-card,
+    .profile-side-card,
+    .settings-card {
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Login and registration: comfortable laptop fit */
+    .auth-container {
+        width: 100% !important;
+        max-width: 520px !important;
+        box-sizing: border-box !important;
+    }
+
+    .auth-card {
+        width: 100% !important;
+        max-width: 520px !important;
+        box-sizing: border-box !important;
+    }
+
+    .register-container {
+        width: 100% !important;
+        min-height: 100vh !important;
+        box-sizing: border-box !important;
+    }
+}
+
