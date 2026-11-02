@@ -467,6 +467,31 @@
                             return;
                         }
 
+                        // Filter jobs by skills
+                        const userSkills = splitSkills(skills);
+                        if (userSkills.length > 0) {
+                            const title = normalizeText(job.title || "");
+                            const jobText = normalizeText(getJobText(job));
+                            const hasMatchingSkill = userSkills.some(function (skill) {
+                                return title.includes(skill) || jobText.includes(skill);
+                            });
+                            if (!hasMatchingSkill) return;
+                        }
+
+                        // Filter jobs by expected salary (INR)
+                        const expectedSalary = Number(salary);
+                        if (Number.isFinite(expectedSalary) && expectedSalary > 0) {
+                            const minSalary = Number(job.salary_min);
+                            const maxSalary = Number(job.salary_max);
+                            const hasMin = job.salary_min != null && job.salary_min !== "" && Number.isFinite(minSalary);
+                            const hasMax = job.salary_max != null && job.salary_max !== "" && Number.isFinite(maxSalary);
+                            if (!hasMin && !hasMax) return;
+                            const currency = String(job.salary_currency || "INR").toUpperCase();
+                            if (currency !== "INR") return;
+                            const highestSalary = hasMin ? minSalary : maxSalary;
+                            if (highestSalary < expectedSalary) return;
+                        }
+
                         const id = getUniqueJobId(job);
 
                         if (!uniqueJobs.has(id)) {
