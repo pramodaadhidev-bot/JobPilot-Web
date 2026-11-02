@@ -472,8 +472,8 @@
                         if (userSkills.length > 0) {
                             const title = normalizeText(job.title || "");
                             const jobText = normalizeText(getJobText(job));
-                            const hasMatchingSkill = userSkills.some(function (skill) {
-                                return title.includes(skill) || jobText.includes(skill);
+                            const hasMatchingSkill = userSkills.every(function (skill) {
+                                const searchableText = (title + " " + jobText).replace(/[^a-z0-9]+/g, " "); return (" " + searchableText + " ").includes(" " + skill.replace(/[^a-z0-9]+/g, " ") + " ");
                             });
                             if (!hasMatchingSkill) return;
                         }
@@ -482,14 +482,12 @@
                         const expectedSalary = Number(salary) * 12; // Convert monthly input to annual salary
                         if (Number.isFinite(expectedSalary) && expectedSalary > 0) {
                             const minSalary = Number(job.salary_min);
-                            const maxSalary = Number(job.salary_max);
                             const hasMin = job.salary_min != null && job.salary_min !== "" && Number.isFinite(minSalary);
-                            const hasMax = job.salary_max != null && job.salary_max !== "" && Number.isFinite(maxSalary);
-                            if (!hasMin && !hasMax) return;
+                            if (!hasMin) return;
                             const currency = String(job.salary_currency || "INR").toUpperCase();
                             if (currency !== "INR") return;
-                            const highestSalary = hasMax ? maxSalary : minSalary;
-                            if (highestSalary < expectedSalary) return;
+                            const advertisedMinSalary = minSalary;
+                            if (advertisedMinSalary < expectedSalary) return;
                         }
 
                         const id = getUniqueJobId(job);
