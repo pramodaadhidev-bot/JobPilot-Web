@@ -479,7 +479,7 @@
                         }
 
                         // Filter jobs by expected salary (INR)
-                        const expectedSalary = Number(salary);
+                        const expectedSalary = Number(salary) * 12; // Convert monthly input to annual salary
                         if (Number.isFinite(expectedSalary) && expectedSalary > 0) {
                             const minSalary = Number(job.salary_min);
                             const maxSalary = Number(job.salary_max);
@@ -488,7 +488,7 @@
                             if (!hasMin && !hasMax) return;
                             const currency = String(job.salary_currency || "INR").toUpperCase();
                             if (currency !== "INR") return;
-                            const highestSalary = hasMin ? minSalary : maxSalary;
+                            const highestSalary = hasMax ? maxSalary : minSalary;
                             if (highestSalary < expectedSalary) return;
                         }
 
