@@ -100,7 +100,7 @@
         ]]
     ];
 
-    const input = document.getElementById("jobQualification");
+    const input = document.getElementById("jobQualification") || document.getElementById("profileQualification");
     const suggestions = document.getElementById("qualificationSuggestions");
     const selectedBox = document.getElementById("selectedQualifications");
 
@@ -216,6 +216,10 @@
     window.JobPilotQualifications = {
         getSelected: function () {
             return selected.slice();
+        },
+        clear: function () {
+            selected.length = 0;
+            renderSelected();
         },
         add: addQualification,
         getLevel: function (value) {

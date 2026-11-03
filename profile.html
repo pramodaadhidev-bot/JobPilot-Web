@@ -462,13 +462,12 @@
                         <small>Separate multiple skills with commas.</small>
                     </div>
 
-                    <div class="profile-field">
+                    <div class="profile-field qualification-field">
                         <label for="profileQualification">🎓 Qualification</label>
-                        <input
-                            type="text"
-                            id="profileQualification"
-                            placeholder="e.g. B.Tech Computer Science"
-                        >
+                        <input type="text" id="profileQualification" placeholder="Search and select qualifications" autocomplete="off">
+                        <div id="qualificationSuggestions" class="qualification-suggestions"></div>
+                        <div id="selectedQualifications" class="selected-qualifications"></div>
+                        <small>Select all qualifications that apply.</small>
                     </div>
 
                     <div class="profile-field">
@@ -490,12 +489,23 @@
                     </div>
 
                     <div class="profile-field">
-                        <label for="profileSalary">💰 Expected salary</label>
-                        <input
-                            type="text"
-                            id="profileSalary"
-                            placeholder="e.g. ₹6 LPA"
-                        >
+                        <label for="profileSalary">💰 Minimum expected salary</label>
+                        <select id="profileSalary">
+                            <option value="">Any starting salary</option>
+                            <option value="1">₹1 LPA</option>
+                            <option value="2">₹2 LPA</option>
+                            <option value="3">₹3 LPA</option>
+                            <option value="4">₹4 LPA</option>
+                            <option value="5">₹5 LPA</option>
+                            <option value="6">₹6 LPA</option>
+                            <option value="8">₹8 LPA</option>
+                            <option value="10">₹10 LPA</option>
+                            <option value="12">₹12 LPA</option>
+                            <option value="15">₹15 LPA</option>
+                            <option value="20">₹20 LPA</option>
+                            <option value="25">₹25 LPA</option>
+                            <option value="30">₹30 LPA</option>
+                        </select>
                     </div>
 
                     <div class="profile-field">
@@ -569,6 +579,7 @@
 
 </div>
 
+<script src="js/qualification.js?v=2"></script>
 <script type="module" src="js/auth.js"></script>
 
 <script type="module">
@@ -631,6 +642,22 @@
         return result;
     }
 
+    function setSalary(value) {
+        const match = String(value || "").match(/[0-9]+(?:\.[0-9]+)?/);
+        salary.value = match ? match[0] : "";
+    }
+
+    function setQualifications(value) {
+        if (!window.JobPilotQualifications) {
+            qualification.value = value || "";
+            return;
+        }
+        window.JobPilotQualifications.clear();
+        String(value || "").split(",").forEach(function (item) {
+            if (item.trim()) window.JobPilotQualifications.add(item.trim());
+        });
+    }
+
     function loadProfile(user) {
         const saved = localStorage.getItem(profileKey(user.uid));
 
@@ -642,10 +669,10 @@
             const data = JSON.parse(saved);
 
             skills.value = data.skills || "";
-            qualification.value = data.qualification || "";
+            setQualifications(data.qualification);
             experience.value = data.experience || "";
             location.value = data.preferredLocation || "";
-            salary.value = data.expectedSalary || "";
+            setSalary(data.expectedSalary);
             jobType.value = data.jobType || "";
         } catch (error) {
             console.error("Unable to load profile:", error);
@@ -682,10 +709,10 @@
                 data.qualification === "Test") return;
 
             skills.value = data.skills || "";
-            qualification.value = data.qualification || "";
+            setQualifications(data.qualification);
             experience.value = data.experience || "";
             location.value = data.preferredLocation || "";
-            salary.value = data.expectedSalary || "";
+            setSalary(data.expectedSalary);
             jobType.value = data.jobType || "";
 
             localStorage.setItem(
@@ -709,7 +736,7 @@
 
         const data = {
             skills: skills.value.trim(),
-            qualification: qualification.value.trim(),
+            qualification: window.JobPilotQualifications ? window.JobPilotQualifications.getSelected().join(", ") : qualification.value.trim(),
             experience: experience.value.trim(),
             preferredLocation: location.value.trim(),
             expectedSalary: salary.value.trim(),
