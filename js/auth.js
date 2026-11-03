@@ -215,6 +215,11 @@ onAuthStateChanged(auth, function(user) {
     const currentPage =
         window.location.pathname.split("/").pop();
 
+    if (currentPage === "jobs.html") {
+        const sidebar = document.querySelector(".jobs-page > .sidebar");
+        if (sidebar) sidebar.style.display = user ? "" : "none";
+    }
+
     if (
         user &&
         (
