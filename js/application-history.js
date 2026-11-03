@@ -1,17 +1,14 @@
 (function () {
     "use strict";
 
-    function renderHistory() {
-        var auth = window.JobPilotAuth && window.JobPilotAuth.auth;
-        var user = auth && auth.currentUser;
+    window.renderApplicationHistory = function (uid) {
         var box = document.getElementById("recentApplications");
-
-        if (!user || !box) return;
+        if (!uid || !box) return;
 
         var applications = [];
         try {
             applications = JSON.parse(
-                localStorage.getItem("jobpilot_applications_" + user.uid) || "[]"
+                localStorage.getItem("jobpilot_applications_" + uid) || "[]"
             );
         } catch (error) {}
 
@@ -19,8 +16,7 @@
 
         if (!Array.isArray(applications) || applications.length === 0) {
             box.innerHTML =
-                '<div class="empty-state compact">' +
-                '<div class="empty-icon">✓</div>' +
+                '<div class="empty-state compact"><div class="empty-icon">✓</div>' +
                 '<h3>No recent applications</h3>' +
                 '<p>Your job applications will appear here.</p></div>';
             return;
@@ -50,8 +46,5 @@
 
             box.appendChild(item);
         });
-    }
-
-    window.addEventListener("load", renderHistory);
-    window.addEventListener("storage", renderHistory);
+    };
 })();
