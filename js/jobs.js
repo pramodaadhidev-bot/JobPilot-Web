@@ -201,21 +201,62 @@
 
     function extractExperienceRange(description) {
         const text = clean(description);
-
-        const match = text.match(
-            /(\d+)\s*(?:-|to)\s*(\d+)\s*years?/i
-        );
-
-        if (!match) {
-            return null;
-        }
-
-        return {
-            min: Number(match[1]),
-            max: Number(match[2])
-        };
+        const range = text.match(/(\d+)\s*(?:-|to)\s*(\d+)\s*years?/i);
+        if (range) return { min: Number(range[1]), max: Number(range[2]) };
+        const plus = text.match(/(\d+)\s*\+\s*years?/i);
+        if (plus) return { min: Number(plus[1]), max: Infinity };
+        const minimum = text.match(/(?:minimum|at least|min\.?|more than)\s*(\d+)\s*years?/i);
+        if (minimum) return { min: Number(minimum[1]), max: Infinity };
+        const years = text.match(/(\d+)\s*years?\s+(?:of\s+)?experience/i);
+        if (years) return { min: Number(years[1]), max: Infinity };
+        return null;
     }
 
+    function isQualificationEligible(job, qualification) {
+        const selected = splitSkills(qualification);
+        job._qualification_priority = 0;
+        job._qualification_match = "unknown";
+        if (selected.length === 0) return true;
+
+        const text = normalizeText(getJobText(job));
+        const title = normalizeText(job.title || "");
+        const highestLevel = window.JobPilotQualifications ? window.JobPilotQualifications.getHighestLevel() : -1;
+        const normalizeDegree = function (value) {
+            return normalizeText(value).replace(/\b(in|of|the)\b/g, " ").replace(/\s+/g, " ").trim();
+        };
+        const selectedMatches = selected.filter(function (item) {
+            const phrase = normalizeDegree(item);
+            return phrase && text.includes(phrase);
+        });
+
+        const requiresHigherQualification = highestLevel >= 0 && ((highestLevel < 2 && /(?:required|must have|minimum qualification|minimum of|at least).{0,80}\b(master.?s degree|postgraduate degree|mca|mtech|msc)\b|\b(master.?s degree|postgraduate degree|mca|mtech|msc)\b.{0,80}(?:required|mandatory)/i.test(text)) || (highestLevel < 3 && /(?:required|must have|minimum qualification|minimum of|at least).{0,80}\b(phd|doctorate|doctoral degree)\b|\b(phd|doctorate|doctoral degree)\b.{0,80}(?:required|mandatory)/i.test(text)));
+        if (requiresHigherQualification) return false;
+
+        if (selectedMatches.length > 0) {
+            let bestPriority = 1;
+            selectedMatches.forEach(function (item) {
+                const level = window.JobPilotQualifications ? window.JobPilotQualifications.getLevel(item) : -1;
+                if (level === highestLevel) bestPriority = 3;
+                else if (level >= 0 && level < highestLevel && bestPriority < 2) bestPriority = 2;
+            });
+            job._qualification_priority = bestPriority;
+            job._qualification_match = "explicit";
+            return true;
+        }
+
+        const computingDegree = selected.some(function (item) {
+            return /\b(bca|mca|bsc computer science|msc computer science|btech computer science|be computer science|information technology|computer applications)\b/i.test(item);
+        });
+        const computingRole = /\b(software|web|frontend|front end|backend|back end|full stack|developer|programmer|data analyst|data scientist|machine learning|artificial intelligence|cyber security|information technology|it support)\b/i.test(title);
+        const hasHigherMandatoryDegree = /\b(master.?s degree|phd|doctorate|doctoral degree|mtech|mca|msc)\b/i.test(text);
+
+        if (computingDegree && computingRole && !hasHigherMandatoryDegree) {
+            job._qualification_priority = 1;
+            job._qualification_match = "inferred";
+            return true;
+        }
+        return false;
+    }
     function calculateMatchScore(
         job,
         userSkills,
@@ -246,33 +287,12 @@
                 (matchedSkills / userSkills.length) * 50;
         }
 
-        // Qualification = 25 points
-        const qualificationText = normalizeText(qualification);
-
-        if (qualificationText) {
-            if (jobText.includes(qualificationText)) {
-                score += 25;
-            } else {
-                const qualificationWords =
-                    qualificationText
-                        .split(/\s+/)
-                        .filter(function (word) {
-                            return word.length >= 3;
-                        });
-
-                if (qualificationWords.length > 0) {
-                    let matchedWords = 0;
-
-                    qualificationWords.forEach(function (word) {
-                        if (jobText.includes(word)) {
-                            matchedWords++;
-                        }
-                    });
-
-                    score +=
-                        (matchedWords / qualificationWords.length) * 25;
-                }
-            }
+        // Qualification = 25 points (complete phrase match only)
+        const selectedQualifications = splitSkills(qualification);
+        if (selectedQualifications.some(function (item) {
+            return jobText.includes(normalizeText(item));
+        })) {
+            score += 25;
         }
 
         // Location = 20 points
@@ -359,7 +379,7 @@
         });
 
         if (clean(qualification)) {
-            terms.push(clean(qualification));
+            splitSkills(qualification).forEach(function (item) { terms.push(item); });
         }
 
         if (terms.length === 0) {
@@ -478,8 +498,33 @@
                             if (!hasMatchingSkill) return;
                         }
 
+                        // Strict qualification eligibility filter
+                        if (!isQualificationEligible(job, qualification)) return;
+
+                        // Strict minimum experience filter
+                        const experienceMatch = String(experience || "").match(/[0-9]+(?:\.[0-9]+)?/);
+                        if (experienceMatch) {
+                            const requiredExperience = extractExperienceRange(job.description || "");
+                            if (requiredExperience && Number(experienceMatch[0]) < requiredExperience.min) return;
+                        }
+
+                        // Strict job type eligibility filter
+                        const selectedJobType = normalizeText(jobType);
+                        if (selectedJobType && selectedJobType !== "all" && selectedJobType !== "any") {
+                            const contractTime = normalizeText(job.contract_time || "").replace(/_/g, " ");
+                            const contractType = normalizeText(job.contract_type || "").replace(/_/g, " ");
+                            const titleAndDescription = normalizeText((job.title || "") + " " + (job.description || ""));
+                            let typeMatches = false;
+                            if (selectedJobType === "full-time") typeMatches = contractTime === "full time";
+                            else if (selectedJobType === "part-time") typeMatches = contractTime === "part time";
+                            else if (selectedJobType === "contract") typeMatches = contractType === "contract";
+                            else if (selectedJobType === "permanent") typeMatches = contractType === "permanent";
+                            else if (selectedJobType === "temporary") typeMatches = contractType === "temporary" || /\btemporary\b/.test(titleAndDescription);
+                            if (!typeMatches) return;
+                        }
+
                         // Filter jobs by expected salary (INR)
-                        const expectedSalary = Number(salary) * 12; // Convert monthly input to annual salary
+                        const expectedSalary = Number(salary) * 100000; // Convert LPA to annual INR
                         if (Number.isFinite(expectedSalary) && expectedSalary > 0) {
                             const minSalary = Number(job.salary_min);
                             const hasMin = job.salary_min != null && job.salary_min !== "" && Number.isFinite(minSalary);
@@ -516,10 +561,9 @@
         const result = Array.from(uniqueJobs.values());
 
         result.sort(function (a, b) {
-            return (
-                Number(b._match_score || 0) -
-                Number(a._match_score || 0)
-            );
+            const qualificationOrder = Number(b._qualification_priority || 0) - Number(a._qualification_priority || 0);
+            if (qualificationOrder !== 0) return qualificationOrder;
+            return Number(b._match_score || 0) - Number(a._match_score || 0);
         });
 
         return result.slice(0, 50);
@@ -1080,6 +1124,7 @@
             const title =
                 job.title ||
                 "Untitled position";
+            const qualificationLabel = job._qualification_match === "explicit" ? "Qualification match" : job._qualification_match === "inferred" ? "Related qualification (inferred)" : "";
 
             const company = getCompanyName(job);
             const companyLogo = getCompanyLogo(job);
@@ -1166,6 +1211,7 @@
                         <h3 class="job-card-title">
                             ${escapeHtml(title)}
                         </h3>
+                        ${qualificationLabel ? `<span class="qualification-match-label">${escapeHtml(qualificationLabel)}</span>` : ""}
 
                         <div class="job-card-company">
                             ${escapeHtml(company)}
@@ -1293,10 +1339,9 @@
                 (document.getElementById("jobSkills") ? document.getElementById("jobSkills").value : "")
             );
 
-        const qualification =
-            clean(
-                (document.getElementById("jobQualification") ? document.getElementById("jobQualification").value : "")
-            );
+        const qualification = window.JobPilotQualifications
+            ? window.JobPilotQualifications.getSelected().join(", ")
+            : clean(document.getElementById("jobQualification").value);
 
         const location =
             clean(

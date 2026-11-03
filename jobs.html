@@ -141,19 +141,16 @@
                     </div>
 
 
-                    <!-- QUALIFICATION -->
-                    <div class="job-field">
+                    <!-- QUALIFICATION MULTI-SELECT -->
+                    <div class="job-field qualification-field">
                         <label for="jobQualification">
                             <span class="field-icon">▤</span>
-                            Qualification
+                            Qualifications
                         </label>
-
-                        <input
-                            type="text"
-                            id="jobQualification"
-                            placeholder="B.Tech Computer Science"
-                            autocomplete="off"
-                        >
+                        <input type="text" id="jobQualification" placeholder="Search degree, department or specialisation..." autocomplete="off">
+                        <div id="qualificationSuggestions" class="qualification-suggestions" style="display:none;"></div>
+                        <div id="selectedQualifications" class="selected-qualifications"></div>
+                        <small>Select multiple qualifications or type your own and press Enter.</small>
                     </div>
 
 
@@ -194,21 +191,30 @@
 
 
                     <!-- SALARY -->
+                    <!-- MINIMUM ANNUAL SALARY -->
                     <div class="job-field">
                         <label for="jobSalary">
                             <span class="field-icon">₹</span>
-                            Expected Monthly Salary
+                            Minimum Expected Salary (LPA)
                         </label>
-
-                        <div class="input-with-prefix">
-                            <span>₹</span>
-                            <input
-                                type="number"
-                                id="jobSalary"
-                                min="0"
-                                placeholder="Expected monthly salary (₹)"
-                            >
-                        </div>
+                        <select id="jobSalary">
+                            <option value="0">Any starting salary</option>
+                            <option value="1">₹1 LPA or above</option>
+                            <option value="2">₹2 LPA or above</option>
+                            <option value="3">₹3 LPA or above</option>
+                            <option value="4">₹4 LPA or above</option>
+                            <option value="5">₹5 LPA or above</option>
+                            <option value="6">₹6 LPA or above</option>
+                            <option value="8">₹8 LPA or above</option>
+                            <option value="10">₹10 LPA or above</option>
+                            <option value="12">₹12 LPA or above</option>
+                            <option value="15">₹15 LPA or above</option>
+                            <option value="20">₹20 LPA or above</option>
+                            <option value="25">₹25 LPA or above</option>
+                            <option value="30">₹30 LPA or above</option>
+                            <option value="40">₹40 LPA or above</option>
+                            <option value="50">₹50 LPA or above</option>
+                        </select>
                     </div>
 
 
@@ -337,7 +343,8 @@
 
 <script src="js/app.js"></script>
 <script type="module" src="js/auth.js"></script>
-<script src="js/jobs.js?v=3"></script>
+<script src="js/jobs.js?v=4"></script>
+<script src="js/qualification.js?v=2"></script>
 
 </body>
 </html>
