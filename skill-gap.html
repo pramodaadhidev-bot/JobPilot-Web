@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Gap Analyzer | JobPilot</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/skill-gap.css">
+</head>
+<body>
+<div class="dashboard sg-layout">
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">✦</div>
+            <div class="brand-text">
+                <div class="brand-name">JobPilot</div>
+                <div class="brand-tagline">Career, simplified.</div>
+            </div>
+        </div>
+
+        <div class="sidebar-profile">
+            <div class="profile-avatar" id="sidebarAvatar">U</div>
+            <div>
+                <div class="profile-name" id="sidebarUserName">Loading...</div>
+                <div class="profile-email" id="sidebarUserEmail"></div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><span>⌂</span><span>Dashboard</span></a>
+            <a href="jobs.html" class="nav-item"><span>⌕</span><span>Find Jobs</span></a>
+            <a href="recommendations.html" class="nav-item"><span>✦</span><span>Recommendations</span></a>
+            <a href="saved.html" class="nav-item"><span>♡</span><span>Saved Jobs</span></a>
+            <a href="resume.html" class="nav-item"><span>▣</span><span>Resume Analysis</span></a>
+            <a href="skill-gap.html" class="nav-item active"><span>✧</span><span>Skill Gap Analyzer</span></a>
+            <a href="profile.html" class="nav-item"><span>◎</span><span>My Profile</span></a>
+            <a href="settings.html" class="nav-item"><span>⚙</span><span>Settings</span></a>
+        </nav>
+
+        <div class="sidebar-bottom">
+            <button class="nav-item logout-btn" id="logoutBtn">
+                <span>↪</span><span>Logout</span>
+            </button>
+        </div>
+    </aside>
+
+    <div class="sg-main">
+        <header class="sg-header">
+            <a href="index.html" class="sg-brand">JobPilot</a>
+            <a href="dashboard.html" class="sg-back">Back to Dashboard</a>
+        </header>
+
+        <main class="sg-container">
+            <section class="sg-hero">
+                <span class="sg-tag">CAREER DEVELOPMENT</span>
+                <h1>Skill Gap Analyzer</h1>
+                <p>Discover the skills you need for your dream job and get a personalized learning roadmap.</p>
+            </section>
+
+            <section class="sg-panel">
+                <h2>Build your skill profile</h2>
+                <form id="skillGapForm">
+                    <label for="targetJob">What job are you aiming for?</label>
+                    <input id="targetJob" type="text" placeholder="e.g. Frontend Developer" required>
+
+                    <label for="currentSkills">What skills do you already have?</label>
+                    <textarea id="currentSkills" rows="4" placeholder="e.g. HTML, CSS, JavaScript, Git" required></textarea>
+                    <small>Separate skills with commas.</small>
+
+                    <button type="submit" id="analyzeButton">Analyze My Skill Gaps</button>
+                </form>
+            </section>
+
+            <section id="results" class="sg-results" hidden>
+                <h2>Your Skill Gap Report</h2>
+                <div id="matchSummary"></div>
+                <div class="sg-columns">
+                    <div class="sg-result-card">
+                        <h3>Skills you have</h3>
+                        <div id="matchedSkills"></div>
+                    </div>
+                    <div class="sg-result-card">
+                        <h3>Skills to improve</h3>
+                        <div id="missingSkills"></div>
+                    </div>
+                </div>
+                <section class="sg-roadmap">
+                    <h2>Your Learning Roadmap</h2>
+                    <p>Follow these steps to build the skills required for your target job.</p>
+                    <div id="roadmap"></div>
+                </section>
+            </section>
+        </main>
+
+        <footer class="sg-footer">JobPilot · Build skills. Grow your career.</footer>
+    </div>
+</div>
+
+<script src="js/app.js"></script>
+<script src="js/skill-gap.js"></script>
+<script type="module" src="js/auth.js"></script>
+<script type="module">
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+const auth = getAuth();
+onAuthStateChanged(auth, function(user) {
+    if (!user) return;
+    const name = user.displayName || "User";
+    const email = user.email || "";
+    const initials = name.split(" ").filter(Boolean).map(part => part.charAt(0)).join("").substring(0, 2).toUpperCase();
+    const nameEl = document.getElementById("sidebarUserName");
+    const emailEl = document.getElementById("sidebarUserEmail");
+    const avatarEl = document.getElementById("sidebarAvatar");
+    if (nameEl) nameEl.textContent = name;
+    if (emailEl) emailEl.textContent = email;
+    if (avatarEl) avatarEl.textContent = initials || "U";
+});
+</script>
+</body>
+</html>
